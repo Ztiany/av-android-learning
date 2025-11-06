@@ -77,8 +77,10 @@ public class FloatingCameraService extends Service {
     private final Camera2Listener mCamera2Listener = new Camera2Listener() {
 
         @Override
-        public void onCameraOpened(CameraDevice cameraDevice, String cameraId, final Size previewSize, final int displayOrientation, boolean isMirror) {
-            Timber.d("onCameraOpened is called(): previewSize = " + previewSize.getWidth() + "x" + previewSize.getHeight());
+        public void onCameraOpened(CameraData cameraData) {
+            Timber.d("onCameraOpened is called(): previewSize = "
+                    + cameraData.previewSize.getWidth()
+                    + "x" + cameraData.previewSize.getHeight());
         }
 
         @Override

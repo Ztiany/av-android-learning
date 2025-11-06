@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import me.ztiany.androidav.MainActivity;
 import me.ztiany.androidav.R;
 import me.ztiany.lib.avbase.camera.camera2.VideoSpec;
 import timber.log.Timber;

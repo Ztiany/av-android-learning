@@ -45,13 +45,19 @@ public class Camera2EncodingActivity extends AppCompatActivity {
     private final Camera2Listener mCamera2Listener = new Camera2Listener() {
 
         @Override
-        public void onCameraOpened(CameraDevice cameraDevice, String cameraId, final Size previewSize, final int displayOrientation, boolean isMirror) {
-            Timber.i("onCameraOpened:  previewSize = " + previewSize.getWidth() + "x" + previewSize.getHeight());
-            Camera2EncodingActivity.this.displayOrientation = displayOrientation;
-            Camera2EncodingActivity.this.isMirrorPreview = isMirror;
-            Camera2EncodingActivity.this.openedCameraId = cameraId;
+        public void onCameraOpened(CameraData cameraData) {
+            Timber.i("onCameraOpened:  previewSize = "
+                    + cameraData.previewSize.getWidth()
+                    + "x" + cameraData.previewSize.getHeight());
+            Camera2EncodingActivity.this.displayOrientation = cameraData.orientation;
+            Camera2EncodingActivity.this.isMirrorPreview = cameraData.isMirror;
+            Camera2EncodingActivity.this.openedCameraId = cameraData.cameraId;
             mH264Encoder.stop();
-            mH264Encoder.initCodec(previewSize.getWidth(), previewSize.getHeight(), displayOrientation);
+            mH264Encoder.initCodec(
+                    cameraData.previewSize.getWidth(),
+                    cameraData.previewSize.getHeight(),
+                    displayOrientation
+            );
         }
 
         @Override

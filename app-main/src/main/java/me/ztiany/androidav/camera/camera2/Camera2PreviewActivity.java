@@ -149,18 +149,14 @@ public class Camera2PreviewActivity extends AppCompatActivity {
 
         @SuppressLint("SetTextI18n")
         @Override
-        public void onCameraOpened(
-                CameraDevice cameraDevice,
-                String cameraId,
-                final Size previewSize,
-                final int orientation,
-                boolean isMirror
-        ) {
-            Timber.i("onCameraOpened:  previewSize = " + previewSize.getWidth() + "x" + previewSize.getHeight());
+        public void onCameraOpened(CameraData cameraData) {
+            Timber.i("onCameraOpened:  previewSize = "
+                    + cameraData.previewSize.getWidth()
+                    + "x" + cameraData.previewSize.getHeight());
 
-            Camera2PreviewActivity.this.displayOrientation = orientation;
-            Camera2PreviewActivity.this.isMirrorPreview = isMirror;
-            Camera2PreviewActivity.this.openedCameraId = cameraId;
+            Camera2PreviewActivity.this.displayOrientation = cameraData.orientation;
+            Camera2PreviewActivity.this.isMirrorPreview = cameraData.isMirror;
+            Camera2PreviewActivity.this.openedCameraId = cameraData.cameraId;
 
             //在相机打开时，添加右上角的 view 用于显示原始数据和预览数据
             runOnUiThread(() -> {
@@ -172,7 +168,7 @@ public class Camera2PreviewActivity extends AppCompatActivity {
                 tvOrigin.setTextColor(Color.WHITE);
                 tvPreview.setText("preview");
                 tvOrigin.setText("origin");
-                boolean needRotate = orientation % 180 != 0;
+                boolean needRotate = cameraData.orientation % 180 != 0;
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 

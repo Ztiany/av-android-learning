@@ -107,7 +107,9 @@ public class Camera2Presenter {
     }
 
     private int getCameraOrientation(int rotation, String cameraId) {
-        Timber.d("getCameraOrientation() called with: rotation = [" + rotation + "], cameraId = [" + cameraId + "]");
+        Timber.d("getCameraOrientation() called with: rotation = ["
+                + rotation + "], cameraId = [" + cameraId + "]");
+
         int degrees = rotation * 90;
         switch (rotation) {
             case Surface.ROTATION_0:
@@ -134,7 +136,8 @@ public class Camera2Presenter {
             result = (mSensorOrientation - degrees + 360) % 360;
         }
 
-        Timber.d("getCameraOrientation: rotation = " + rotation + " result = " + result + " sensorOrientation = " + mSensorOrientation);
+        Timber.d("getCameraOrientation: rotation = " + rotation + " result = "
+                + result + " sensorOrientation = " + mSensorOrientation);
         return result;
     }
 
@@ -176,13 +179,14 @@ public class Camera2Presenter {
             mCameraDevice = cameraDevice;
             createPreviewSession(null, null);
             if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraOpened(
+                Camera2Listener.CameraData cameraData = new Camera2Listener.CameraData(
                         cameraDevice,
                         mCameraId,
                         mPreviewSize,
                         getCameraOrientation(mRotation, mCameraId),
                         mIsMirror
                 );
+                mCamera2Listener.onCameraOpened(cameraData);
             }
         }
 
@@ -206,7 +210,7 @@ public class Camera2Presenter {
             closeCameraDevice();
 
             if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(new Exception("error occurred, code is " + error));
+                mCamera2Listener.onCameraError(new CameraErrorException("error occurred, code is " + error));
             }
         }
 
@@ -282,35 +286,21 @@ public class Camera2Presenter {
         stopBackgroundThread();
     }
 
-    private boolean setUpCameraOutputs(CameraManager cameraManager) {
-        try {
-            if (mCameraSelector != null) {
-                String[] cameraIdList = cameraManager.getCameraIdList();
-                String targetId = mCameraSelector.selectCamera(Arrays.asList(cameraIdList));
-                if (configCameraParams(cameraManager, targetId)) {
-                    return true;
-                }
-            }
-
-            if (!TextUtils.isEmpty(mSpecifiedCameraId) && configCameraParams(cameraManager, mSpecifiedCameraId)) {
+    private boolean setUpCameraOutputs(CameraManager cameraManager) throws CameraAccessException {
+        if (mCameraSelector != null) {
+            String[] cameraIdList = cameraManager.getCameraIdList();
+            String targetId = mCameraSelector.selectCamera(Arrays.asList(cameraIdList));
+            if (configCameraParams(cameraManager, targetId)) {
                 return true;
             }
-            for (String cameraId : cameraManager.getCameraIdList()) {
-                if (configCameraParams(cameraManager, cameraId)) {
-                    return true;
-                }
-            }
-        } catch (CameraAccessException | IllegalArgumentException exception) {
-            Timber.e(exception, "setUpCameraOutputs");
-            if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(exception);
-            }
-        } catch (NullPointerException nullPointerException) {
-            Timber.e(nullPointerException, "setUpCameraOutputs");
-            // Currently an NPE is thrown when the Camera2API is used but not supported on the
-            // device this code runs.
-            if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(nullPointerException);
+        }
+
+        if (!TextUtils.isEmpty(mSpecifiedCameraId) && configCameraParams(cameraManager, mSpecifiedCameraId)) {
+            return true;
+        }
+        for (String cameraId : cameraManager.getCameraIdList()) {
+            if (configCameraParams(cameraManager, cameraId)) {
+                return true;
             }
         }
         return false;
@@ -335,7 +325,8 @@ public class Camera2Presenter {
         }
         this.mCameraId = cameraId;
 
-        mPreviewSize = mSizeSelector.getBestSupportedSize(new ArrayList<>(Arrays.asList(configurationMap.getOutputSizes(SurfaceTexture.class))));
+        ArrayList<Size> sizes = new ArrayList<>(Arrays.asList(configurationMap.getOutputSizes(SurfaceTexture.class)));
+        mPreviewSize = mSizeSelector.getBestSupportedSize(sizes);
 
         if (mOutputProvider != null) {
             mOutputProvider.onAttach(mCamera2Handle, new OutputProvider.Components() {
@@ -353,6 +344,9 @@ public class Camera2Presenter {
     private void openCamera() {
         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             Timber.e("openCamera failed, no camera permission!");
+            if (mCamera2Listener != null) {
+                mCamera2Listener.onCameraError(new CameraPermissionException());
+            }
             return;
         }
 
@@ -360,24 +354,35 @@ public class Camera2Presenter {
         try {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 Timber.e("Time out waiting to lock camera opening.");
+                if (mCamera2Listener != null) {
+                    mCamera2Listener.onCameraError(new NonCameraErrorException("Time out waiting to lock camera opening."));
+                }
                 return;
             }
+
             if (setUpCameraOutputs(cameraManager)) {
+                Timber.d("do open camera: %s", mCameraId);
                 configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
                 cameraManager.openCamera(mCameraId, mDeviceStateCallback, mBackgroundHandler);
             } else {
                 mCameraOpenCloseLock.release();
+                if (mCamera2Listener != null) {
+                    mCamera2Listener.onCameraError(new CameraErrorException("setUpCameraOutputs!"));
+                }
             }
+
         } catch (CameraAccessException | SecurityException | IllegalArgumentException exception) {
             Timber.e(exception, "openCamera");
             mCameraOpenCloseLock.release();
             if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(exception);
+                mCamera2Listener.onCameraError(new CameraErrorException("openCamera failed: "
+                        + exception.getMessage(), exception));
             }
         } catch (InterruptedException exception) {
             Timber.e(exception, "openCamera");
             if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(exception);
+                mCamera2Listener.onCameraError(new NonCameraErrorException("openCamera failed: "
+                        + exception.getMessage(), exception));
             }
         }
     }
@@ -398,9 +403,10 @@ public class Camera2Presenter {
 
             closeCameraDevice();
 
-        } catch (InterruptedException e) {
+        } catch (InterruptedException exception) {
             if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraError(e);
+                mCamera2Listener.onCameraError(new CameraErrorException("closeCamera failed: "
+                        + exception.getMessage(), exception, false));
             }
         } finally {
             mCameraOpenCloseLock.release();
@@ -446,6 +452,7 @@ public class Camera2Presenter {
 
         SurfaceTexture texture = mTextureView.getSurfaceTexture();
         if (texture == null) {
+            Timber.w("texture is null! no preview session will be created!");
             return;
         }
 
@@ -469,7 +476,7 @@ public class Camera2Presenter {
             if (outputSurface != null) {
                 targets.add(outputSurface);
             }
-            // added through provideSurface
+            // added through OutputProvider
             if (mOutputProvider != null) {
                 Surface providedSurface = mOutputProvider.provideSurface();
                 if (providedSurface != null && !targets.contains(providedSurface)) {
@@ -501,7 +508,7 @@ public class Camera2Presenter {
                     Timber.d("StateCallback.onConfigureFailed()");
 
                     if (mCamera2Listener != null) {
-                        mCamera2Listener.onCameraError(new Exception("configureFailed"));
+                        mCamera2Listener.onCameraError(new CameraErrorException("configureFailed"));
                     }
 
                     if (callback != null) {
@@ -513,6 +520,10 @@ public class Camera2Presenter {
             mCameraDevice.createCaptureSession(targets, configureFailed, mBackgroundHandler);
         } catch (CameraAccessException cameraAccessException) {
             Timber.e(cameraAccessException, "createCameraPreviewSession");
+            if (mCamera2Listener != null) {
+                mCamera2Listener.onCameraError(new CameraErrorException("createCaptureSession failed: "
+                        + cameraAccessException.getMessage(), cameraAccessException));
+            }
         }
     }
 
@@ -538,6 +549,10 @@ public class Camera2Presenter {
             );
         } catch (Exception exception) {
             Timber.e(exception, "setRepeatingRequest");
+            if (mCamera2Listener != null) {
+                mCamera2Listener.onCameraError(new CameraErrorException("startPreview failed: "
+                        + exception.getMessage(), exception));
+            }
         }
     }
 
@@ -546,18 +561,29 @@ public class Camera2Presenter {
      */
     private void closeCameraSession() {
         if (mCaptureSession != null) {
-            mCaptureSession.close();
+            try {
+                mCaptureSession.close();
+            } catch (Exception exception) {
+                Timber.e(exception, "closeCameraSession");
+            }
             mCaptureSession = null;
         }
     }
 
     private void closeCameraDevice() {
-        if (null != mCameraDevice) {
+        if (null == mCameraDevice) {
+            Timber.d("mCameraDevice is already null.");
+            return;
+        }
+        try {
             mCameraDevice.close();
-            mCameraDevice = null;
-            if (mCamera2Listener != null) {
-                mCamera2Listener.onCameraClosed();
-            }
+        } catch (Exception e) {
+            Timber.d("closeCameraDevice");
+        }
+        mCameraDevice = null;
+
+        if (mCamera2Listener != null) {
+            mCamera2Listener.onCameraClosed();
         }
     }
 

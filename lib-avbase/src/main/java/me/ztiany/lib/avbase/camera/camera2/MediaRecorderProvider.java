@@ -1,6 +1,5 @@
 package me.ztiany.lib.avbase.camera.camera2;
 
-import android.content.Context;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
