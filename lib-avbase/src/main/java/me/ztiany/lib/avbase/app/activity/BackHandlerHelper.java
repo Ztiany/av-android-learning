@@ -32,7 +32,8 @@ public class BackHandlerHelper {
     public static boolean isFragmentBackHandled(Fragment fragment) {
         return fragment != null
                 && fragment.isVisible()
-                && fragment.getUserVisibleHint() //getUserVisibleHint默认情况下为true，在ViewPager中会被使用到。
+                // getUserVisibleHint 默认情况下为 true，在 ViewPager 中会被使用到。
+                && fragment.getUserVisibleHint()
                 && fragment instanceof OnBackPressListener
                 && ((OnBackPressListener) fragment).onBackPressed();
     }

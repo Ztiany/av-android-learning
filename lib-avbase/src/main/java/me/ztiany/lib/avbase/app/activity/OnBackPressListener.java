@@ -6,7 +6,7 @@ package me.ztiany.lib.avbase.app.activity;
 public interface OnBackPressListener {
 
     /**
-     * @return true 表示 Fragment 处理 on back press，false 表示由 Activity 处理。
+     * @return true 表示 Fragment 处理 back-press，false 表示由 Activity 处理。
      */
     boolean onBackPressed();
 

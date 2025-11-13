@@ -1,5 +1,8 @@
 package me.ztiany.lib.avbase.utils.ui
 
+import android.content.Context
+import android.graphics.Point
+import android.os.Build
 import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
@@ -8,7 +11,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import timber.log.Timber
 
-class ImmerseModeHelper(private val activity: FragmentActivity) {
+class ImmerseModeCompat(private val activity: FragmentActivity) {
 
     private val windowInsetsController by lazy {
         WindowCompat.getInsetsController(activity.window, activity.window.decorView)
@@ -25,7 +28,12 @@ class ImmerseModeHelper(private val activity: FragmentActivity) {
     }
 
     private val screenHeight by lazy {
-        SystemBarCompat.getNavigationBarHeightIgnoreVisibility(activity)
+        val wm = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            wm.currentWindowMetrics.bounds.height()
+        } else {
+            Point().apply { wm.defaultDisplay.getRealSize(this) }.y
+        }
     }
 
     init {
@@ -36,7 +44,8 @@ class ImmerseModeHelper(private val activity: FragmentActivity) {
 
     fun setFullScreen() {
         // Configure the behavior of the hidden system bars
-        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         // Hide both the status bar and the navigation bar
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
         //extend to system bars
@@ -49,7 +58,8 @@ class ImmerseModeHelper(private val activity: FragmentActivity) {
             Timber.d("displayInNotch")
             val window = activity.window
             val attributes = window.attributes
-            attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             window.attributes = attributes
         }
     }

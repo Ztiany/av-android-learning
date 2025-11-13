@@ -13,24 +13,32 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
+import timber.log.Timber;
+
 public class FileUtils {
 
     public static void copyAssets(String assetsName, String path) throws IOException {
-        AssetFileDescriptor assetFileDescriptor = Utils.getApp().getAssets().openFd(assetsName);
-        FileChannel from = new FileInputStream(assetFileDescriptor.getFileDescriptor()).getChannel();
-        FileChannel to = new FileOutputStream(path).getChannel();
-        from.transferTo(assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength(), to);
+        try (AssetFileDescriptor assetFileDescriptor = Utils.getApp().getAssets().openFd(assetsName)) {
+            try (FileInputStream fis = new FileInputStream(assetFileDescriptor.getFileDescriptor())) {
+                FileChannel from = fis.getChannel();
+                try (FileOutputStream fos = new FileOutputStream(path)) {
+                    FileChannel to = fos.getChannel();
+                    from.transferTo(assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength(), to);
+                }
+            }
+        }
     }
 
     public static String loadAssets(String assetsName) throws IOException {
-        InputStream inputStream = Utils.getApp().getAssets().open(assetsName);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int read = 0;
-        while ((read = inputStream.read(buffer)) > 0) {
-            byteArrayOutputStream.write(buffer, 0, read);
+        try (InputStream inputStream = Utils.getApp().getAssets().open(assetsName)) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int read = 0;
+            while ((read = inputStream.read(buffer)) > 0) {
+                byteArrayOutputStream.write(buffer, 0, read);
+            }
+            return byteArrayOutputStream.toString();
         }
-        return byteArrayOutputStream.toString();
     }
 
     public static void writeBytes(OutputStream outputStream, byte[] array, boolean endFlag) {
@@ -41,8 +49,8 @@ public class FileUtils {
                 outputStream.write('\n');
                 outputStream.write('\n');
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioException) {
+            Timber.e(ioException, "writeBytes() failed");
         }
     }
 
@@ -61,8 +69,9 @@ public class FileUtils {
             writer.write("\n");
             writer.write("\n");
             writer.write("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioException) {
+            Timber.e(ioException, "writeContent() failed");
+
         }
     }
 

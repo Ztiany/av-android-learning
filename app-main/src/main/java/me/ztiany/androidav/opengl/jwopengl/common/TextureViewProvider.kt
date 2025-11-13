@@ -13,7 +13,7 @@ class TextureViewProvider(private val textureView: TextureView) : SurfaceProvide
 
     override fun start(surfaceProviderCallback: SurfaceProviderCallback) {
         if (this::surfaceProviderCallback.isInitialized) {
-            throw UnsupportedOperationException("call this only once.")
+            throw UnsupportedOperationException("You should call this method only once.")
         }
         this.surfaceProviderCallback = surfaceProviderCallback
 
