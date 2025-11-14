@@ -17,13 +17,24 @@ import me.ztiany.lib.avbase.app.activity.BaseActivity
 class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBinding>() {
 
     private var cameraOperator: CameraOperator? = null
+
     private var cameraRenderer: CameraRenderer? = null
 
     private fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isMirror: Boolean) {
         if ((displayOrientation / 90).mod(2) == 1) {
-            cameraRenderer?.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation, isMirror)
+            cameraRenderer?.setVideoAttribute(
+                previewSize.height,
+                previewSize.width,
+                displayOrientation,
+                isMirror
+            )
         } else {
-            cameraRenderer?.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation, isMirror)
+            cameraRenderer?.setVideoAttribute(
+                previewSize.width,
+                previewSize.height,
+                displayOrientation,
+                isMirror
+            )
         }
         cameraRenderer?.getSurfaceTexture {
             cameraOperator?.startPreview(it)
@@ -42,11 +53,13 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
 
     private fun setUpGlSurfaceView() {
         binding.openglCameraView.setEGLContextClientVersion(2)
+
         cameraRenderer = CameraRenderer(this, object : EGLBridger {
             override fun requestRender() {
                 binding.openglCameraView.requestRender()
             }
         })
+
         cameraRenderer?.let {
             binding.openglCameraView.setGLRenderer(it)
             binding.openglCameraView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
@@ -55,7 +68,11 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
 
     private fun setUpCamera() {
         val cameraListener = CameraListener { _, cameraID, previewSize, displayOrientation ->
-            onCameraAvailable(previewSize, displayOrientation, CameraOperator.CAMERA_ID_FRONT == cameraID)
+            onCameraAvailable(
+                previewSize,
+                displayOrientation,
+                CameraOperator.CAMERA_ID_FRONT == cameraID
+            )
         }
 
         val openglCameraView = binding.openglCameraView

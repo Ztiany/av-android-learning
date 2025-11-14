@@ -32,7 +32,12 @@ class SurfaceViewProvider(private val surfaceView: SurfaceView) : SurfaceProvide
                 surfaceProviderCallback.onSurfaceAvailable(holder.surface)
             }
 
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
                 Timber.d("surfaceChanged() called with: holder = $holder, format = $format, width = $width, height = $height")
                 surfaceProviderCallback.onSurfaceChanged(holder.surface, width, height)
             }

@@ -32,18 +32,19 @@ class EGLEnvironment(
     private val eglCore = EGLCore()
 
     private lateinit var glRenderer: GLRenderer
+
     private lateinit var eglHandler: Handler
 
     @Volatile private var surfaceAvailable = false
 
     @Volatile var renderMode = RenderMode.Continuously
 
-    fun start(GLRenderer: GLRenderer) {
+    fun start(glRenderer: GLRenderer) {
         if (this::glRenderer.isInitialized) {
             throw IllegalStateException("renderer has already been set.")
         }
 
-        this.glRenderer = GLRenderer
+        this.glRenderer = glRenderer
 
         eglThread.start()
         eglHandler = Handler(eglThread.looper, ::handleMessage)

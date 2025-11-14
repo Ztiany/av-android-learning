@@ -6,7 +6,7 @@ import android.util.Size;
 public interface CameraListener {
 
     /**
-     * 当打开时执行
+     * 当打开时执行。
      *
      * @param camera             相机实例
      * @param cameraId           相机ID
@@ -15,18 +15,18 @@ public interface CameraListener {
     void onCameraOpened(ICamera camera, String cameraId, Size previewSize, int displayOrientation);
 
     /**
-     * 当相机关闭时执行
+     * 当相机关闭时执行。
      */
     default void onCameraClosed() {
 
     }
 
     /**
-     * 当出现异常时执行
+     * 当出现异常时执行。
      *
-     * @param e 相机相关异常
+     * @param exception 相机相关异常。
      */
-    default void onCameraError(Exception e) {
+    default void onCameraError(Exception exception) {
     }
 
 }

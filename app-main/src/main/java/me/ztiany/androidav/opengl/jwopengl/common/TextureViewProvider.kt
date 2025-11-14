@@ -9,6 +9,7 @@ import timber.log.Timber
 class TextureViewProvider(private val textureView: TextureView) : SurfaceProvider {
 
     private lateinit var surfaceProviderCallback: SurfaceProviderCallback
+
     private var surface: Surface? = null
 
     override fun start(surfaceProviderCallback: SurfaceProviderCallback) {

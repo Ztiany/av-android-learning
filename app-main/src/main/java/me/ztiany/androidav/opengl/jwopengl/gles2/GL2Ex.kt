@@ -71,12 +71,12 @@ fun newTextureCoordinateAndroid() = floatArrayOf(
 
 fun loadShader(type: Int, shaderCode: String): Int {
     val shader = GLES20.glCreateShader(type)
-    //设置源码
+    // 设置源码
     GLES20.glShaderSource(shader, shaderCode)
-    //编译源码
+    // 编译源码
     GLES20.glCompileShader(shader)
 
-    //状态检测
+    // 状态检测
     val status = IntArray(1)
     GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, status, 0)
     check(status[0] == GLES20.GL_TRUE) {
@@ -123,7 +123,7 @@ fun generateGLProgram(vertexSource: String, fragmentSource: String): Int {
     val status = IntArray(1)
     GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, status, 0);
     if (status[0] != GLES20.GL_TRUE) {
-        throw   IllegalStateException("link program:" + GLES20.glGetProgramInfoLog(program));
+        throw IllegalStateException("link program:" + GLES20.glGetProgramInfoLog(program));
     }
 
     //释放资源
@@ -137,9 +137,11 @@ fun generateGLProgramFromAssets(vertexPath: String, fragmentPath: String): Int {
 }
 
 /**
- * 顶点缓冲对象（Vertex Buffer Objects，VBO），VBO 是在显卡存储空间中开辟出的一块内存缓存区， * 用于存储顶点的各类属性信息，如顶点坐标，顶点法向量，顶点颜色数据等。
+ * 顶点缓冲对象（Vertex Buffer Objects，VBO），VBO 是在显卡存储空间中开辟出的一块内存缓存区，用于存储顶点的各类属性
+ * 信息，如顶点坐标，顶点法向量，顶点颜色数据等。
  */
-fun generateVBOBuffer(vboData: FloatArray): FloatBuffer = ByteBuffer.allocateDirect(vboData.size * 4 /*one float has four bytes.*/)
-    .order(ByteOrder.nativeOrder())
-    .asFloatBuffer()
-    .put(vboData).also { it.position(0) }//将坐标数据转换为 FloatBuffer
+fun generateVBOBuffer(vboData: FloatArray): FloatBuffer =
+    ByteBuffer.allocateDirect(vboData.size * 4 /* one float has four bytes. */)
+        .order(ByteOrder.nativeOrder())
+        .asFloatBuffer()
+        .put(vboData).also { it.position(0) }// 将坐标数据转换为 FloatBuffer。

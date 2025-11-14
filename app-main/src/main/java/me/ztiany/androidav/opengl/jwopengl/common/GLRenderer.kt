@@ -19,7 +19,9 @@ interface GLRenderer {
     fun onDrawFrame(attachment: Any? = null)
 
     /**
-     * Called when egl context release.【It is not guaranteed that this method will be called at the end of drawing.】
+     * Called when egl context release.
+     *
+     * Note: It is not guaranteed that this method will be called at the end of drawing.
      */
     fun onSurfaceDestroy()
 

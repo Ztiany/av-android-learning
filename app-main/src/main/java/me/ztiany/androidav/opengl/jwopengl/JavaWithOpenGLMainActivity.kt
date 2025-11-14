@@ -37,13 +37,23 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         CommonItem("绘制纹理", TextureRenderer::class.java),
         CommonItem("绘制纹理（修正1）", Fixed1TextureRenderer::class.java),
         CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
+
         ActivityItem("相机预览（GLSurfaceView）", OpenGLCameraPreviewActivity::class.java),
+
         ActivityItem("相机预览（EGL + SurfaceView）", EGLCameraPreviewWithActivity::class.java) {
-            it.putExtra(EGLCameraPreviewWithActivity.RENDER_TYPE, EGLCameraPreviewWithActivity.WITH_SURFACE_VIEW)
+            it.putExtra(
+                EGLCameraPreviewWithActivity.RENDER_TYPE,
+                EGLCameraPreviewWithActivity.WITH_SURFACE_VIEW
+            )
         },
+
         ActivityItem("相机预览（EGL + TextureView）", EGLCameraPreviewWithActivity::class.java) {
-            it.putExtra(EGLCameraPreviewWithActivity.RENDER_TYPE, EGLCameraPreviewWithActivity.WITH_TEXTURE_VIEW)
+            it.putExtra(
+                EGLCameraPreviewWithActivity.RENDER_TYPE,
+                EGLCameraPreviewWithActivity.WITH_TEXTURE_VIEW
+            )
         },
+
         ActivityItem("相机预览+特效+录频（FBO）", OpenGLRecorderActivity::class.java),
     )
 
@@ -63,7 +73,10 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         val item = entrances[index]
         if (item is CommonItem) {
             JavaWithOpenGLCommonActivity.start(this, item.title, item.renderer)
-        } else if (item is ActivityItem) {
+            return
+        }
+
+        if (item is ActivityItem) {
             startActivity(Intent(this, item.activity).apply {
                 item.onIntent?.invoke(this)
             })

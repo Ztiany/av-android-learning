@@ -16,10 +16,10 @@ class GLMVPMatrix {
         private const val DEFAULT_FAR = 6F
     }
 
-    /**用于接收 mvp 的计算结果*/
+    /** 用于接收 mvp 的计算结果 */
     val mvpMatrix = FloatArray(16)
 
-    /**默认为单位矩阵*/
+    /** 默认为单位矩阵 */
     val modelMatrix = floatArrayOf(
         1.0F, 0F, 0F, 0F,
         0.0F, 1.0F, 0F, 0F,
@@ -27,7 +27,7 @@ class GLMVPMatrix {
         0.0F, 0F, 0F, 1.0F,
     )
 
-    /**默认为单位矩阵*/
+    /** 默认为单位矩阵 */
     val viewMatrix = floatArrayOf(
         1.0F, 0F, 0F, 0F,
         0.0F, 1.0F, 0F, 0F,
@@ -64,18 +64,18 @@ class GLMVPMatrix {
     fun getModelWidth() = modelWidth
     fun getModelHeight() = modelHeight
 
-    /**一般的相机摆放位置*/
+    /** 一般的相机摆放位置 */
     fun lookAtNormally() {
         lookAt(
             0F, 0F, DEFAULT_CAMERA_Z,
-            //看向原点
+            // 看向原点
             0F, 0F, 0F,
-            //人眼水平视角
+            // 人眼水平视角
             0F, 1F, 0F
         )
     }
 
-    /**摆放相机*/
+    /** 摆放相机 */
     fun lookAt(
         eyeX: Float, eyeY: Float, eyeZ: Float,
         centerX: Float, centerY: Float, centerZ: Float,
@@ -92,7 +92,7 @@ class GLMVPMatrix {
         )
     }
 
-    /**设置为正交投影*/
+    /** 设置为正交投影 */
     fun adjustToOrthogonal(
         near: Float = DEFAULT_NEAR,
         far: Float = DEFAULT_FAR

@@ -26,14 +26,26 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
     }
 
     private var cameraOperator: CameraOperator? = null
+
     private var eglEnvironment: EGLEnvironment? = null
+
     private var cameraRenderer: CameraRenderer? = null
 
     private fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isMirror: Boolean) {
         if ((displayOrientation / 90).mod(2) == 1) {
-            cameraRenderer?.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation, isMirror)
+            cameraRenderer?.setVideoAttribute(
+                previewSize.height,
+                previewSize.width,
+                displayOrientation,
+                isMirror
+            )
         } else {
-            cameraRenderer?.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation, isMirror)
+            cameraRenderer?.setVideoAttribute(
+                previewSize.width,
+                previewSize.height,
+                displayOrientation,
+                isMirror
+            )
         }
         cameraRenderer?.getSurfaceTexture {
             cameraOperator?.startPreview(it)
@@ -81,7 +93,11 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
 
     private fun setUpCamera(point: Point) {
         val cameraListener = CameraListener { _, cameraID, previewSize, displayOrientation ->
-            onCameraAvailable(previewSize, displayOrientation, CameraOperator.CAMERA_ID_FRONT == cameraID)
+            onCameraAvailable(
+                previewSize,
+                displayOrientation,
+                CameraOperator.CAMERA_ID_FRONT == cameraID
+            )
         }
 
         cameraOperator = CameraBuilder()

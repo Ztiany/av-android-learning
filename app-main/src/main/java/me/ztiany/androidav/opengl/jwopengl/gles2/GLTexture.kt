@@ -34,14 +34,16 @@ fun GLTexture.activeTexture() {
     if (handleInShader == GLTexture.NONE) {
         throw IllegalStateException("The GLTexture was not bound with a handle. Call an alternative one instead.")
     }
-    //激活指定纹理单元【有 32 个纹理单位，默认只有 0 号纹理单元是激活的】为了代码的统一性，不管哪个纹理，都调用一次 glActiveTexture，多次调用没有问题。
+    // 激活指定纹理单元【有 32 个纹理单位，默认只有 0 号纹理单元是激活的】为了代码的统一性，不管哪个纹理，都调用一次
+    // glActiveTexture，多次调用没有问题。
     GLES20.glActiveTexture(getTextureIdentificationByIndex(index))
-    //绑定纹理 ID 到当前激活的纹理单元。
+    // 绑定纹理 ID 到当前激活的纹理单元。
     GLES20.glBindTexture(type, id)
-    //将激活的纹理单元传递到着色器里面。
-    //我们使用 glUniform1i 设置 uniform 采样器的位置值，或者说纹理单元。通过 glUniform1i 的设置，我们保证每个 uniform 采样器对应着正确的纹理单元。
-    //为一个纹理变量指定纹理数值 0，表示从 GL_TEXTURE0 采样。
-    //为一个纹理变量指定纹理数值 1，表示从 GL_TEXTURE1 采样。
+    // 将激活的纹理单元传递到着色器里面。
+    // 我们使用 glUniform1i 设置 uniform 采样器的位置值，或者说纹理单元。通过 glUniform1i 的设置，我们保证每个
+    // uniform 采样器对应着正确的纹理单元。
+    //      为一个纹理变量指定纹理数值 0，表示从 GL_TEXTURE0 采样。
+    //      为一个纹理变量指定纹理数值 1，表示从 GL_TEXTURE1 采样。
     GLES20.glUniform1i(handleInShader, index)
 }
 
@@ -92,20 +94,27 @@ fun generateTextureFromBitmap(
     textureIndex: Int,
     bitmap: Bitmap
 ): GLTexture {
-    //申请纹理
+    // 申请纹理
     val textureObjectIds = allocateTextureObject()
 
-    //设置通用属性
+    // 设置通用属性
     val textureType = GLES20.GL_TEXTURE_2D
     setCommonAttribute(textureType, textureObjectIds[0])
 
-    //通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
+    // 通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
     GLES20.glBindTexture(textureType, textureObjectIds[0])
     GLUtils.texImage2D(textureType, 0, bitmap, 0)
     GLES20.glBindTexture(textureType, 0)
 
-    //返回纹理封装对象
-    return GLTexture(textureObjectIds[0], textureType, textureHandle, textureIndex, bitmap.width, bitmap.height).apply {
+    // 返回纹理封装对象
+    return GLTexture(
+        textureObjectIds[0],
+        textureType,
+        textureHandle,
+        textureIndex,
+        bitmap.width,
+        bitmap.height
+    ).apply {
         Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
     }
 }
@@ -122,36 +131,53 @@ fun generateFBOTexture(
     width: Int,
     height: Int
 ): GLTexture {
-    //申请纹理
+    // 申请纹理
     val textureObjectIds = allocateTextureObject()
 
-    //设置通用属性
+    // 设置通用属性
     val textureType = GLES20.GL_TEXTURE_2D
     setCommonAttribute(textureType, textureObjectIds[0])
 
-    //这里应该是申请了内存
+    // 这里应该是申请了内存
     GLES20.glBindTexture(textureType, textureObjectIds[0])
-    GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null)
+    GLES20.glTexImage2D(
+        GLES20.GL_TEXTURE_2D,
+        0,
+        GLES20.GL_RGBA,
+        width,
+        height,
+        0,
+        GLES20.GL_RGBA,
+        GLES20.GL_UNSIGNED_BYTE,
+        null
+    )
     GLES20.glBindTexture(textureType, 0)
 
-    //返回纹理封装对象
-    return GLTexture(textureObjectIds[0], textureType, textureHandle, textureIndex, width, height).apply {
+    // 返回纹理封装对象
+    return GLTexture(
+        textureObjectIds[0],
+        textureType,
+        textureHandle,
+        textureIndex,
+        width,
+        height
+    ).apply {
         Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
     }
 }
 
 
 private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
-    //绑定到这个纹理对象，之后的纹理操作就是对这个纹理对象进行操作。
+    // 绑定到这个纹理对象，之后的纹理操作就是对这个纹理对象进行操作。
     GLES20.glBindTexture(textureType, textureObjectId)
 
-    //设置纹理缩放过滤
-    // GL_NEAREST: 使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
-    // GL_LINEAR: 使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色，速度较慢，但视觉效果好
+    // 设置纹理缩放过滤
+    //  GL_NEAREST: 使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+    //  GL_LINEAR: 使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色，速度较慢，但视觉效果好
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
-    //纹理坐标的范围是 0-1。超出这一范围的坐标将被 OpenGL 根据 GL_TEXTURE_WRAP 参数的值进行处理
+    // 纹理坐标的范围是 0-1。超出这一范围的坐标将被 OpenGL 根据 GL_TEXTURE_WRAP 参数的值进行处理
     //  GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T 分别为 x，y 方向。
     //  GL_REPEAT：平铺。
     //  GL_MIRRORED_REPEAT：纹理坐标是奇数时使用镜像平铺。
@@ -166,8 +192,11 @@ private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
 private fun allocateTextureObject(): IntArray {
     /*
     申请一个纹理对象，返回这个对象的 id，注意：
-        1. The generated textures have no dimensionality; they assume the dimensionality of the texture target to which they are first bound (see glBindTexture).
-        2. glGenTextures only allocates texture "names" (eg ids) with no "dimensionality". So you are not actually allocating texture memory as such, and the overhead here is negligible compared to actual texture memory allocation.
+        1. The generated textures have no dimensionality; they assume the dimensionality of the
+           texture target to which they are first bound (see glBindTexture).
+        2. glGenTextures only allocates texture "names" (eg ids) with no "dimensionality". So you
+           are not actually allocating texture memory as such, and the overhead here is negligible
+           compared to actual texture memory allocation.
         3. glTexImage will actually control the amount of texture memory used per texture.
      */
     val textureObjectIds = IntArray(1)

@@ -67,7 +67,7 @@ class GLProgram(
             elementsPerVertex,
             GLES20.GL_FLOAT,
             false,
-            elementsPerVertex * 4/*每个点 4 个 float，每个 float 4 个  byte*/,
+            elementsPerVertex * 4/* 每个点 4 个 float，每个 float 4 个 byte */,
             vbo
         )
     }
@@ -85,7 +85,7 @@ class GLProgram(
             elementsPerVertex,
             GLES20.GL_INT,
             false,
-            elementsPerVertex * 4/*每个点 4 个 float，每个 float 4 个  byte*/,
+            elementsPerVertex * 4/* 每个点 4 个 float，每个 float 4 个 byte */,
             vbo
         )
     }
