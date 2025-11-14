@@ -10,47 +10,47 @@ import timber.log.Timber;
 public final class CameraBuilder {
 
     /**
-     * 是否镜像显示，只支持 textureView
+     * 是否镜像显示，只支持 textureView。
      */
     boolean isMirror;
 
     /**
-     * 指定的相机 ID
+     * 指定的相机 ID。
      */
     String specificCameraId;
 
     /**
-     * 事件回调
+     * 相机事件回调。
      */
     CameraListener mCameraListener;
 
     /**
-     * 屏幕的长宽，在选择最佳相机比例时用到
+     * 屏幕的长宽，在选择最佳相机比例时用到。
      */
     Point previewViewSize;
 
     /**
-     * 传入 getWindowManager().getDefaultDisplay().getRotation() 的值即可
+     * 传入 getWindowManager().getDefaultDisplay().getRotation() 的值即可。
      */
     int rotation;
 
     /**
-     * 指定的预览宽高，若系统支持则会以这个预览宽高进行预览
+     * 指定的预览宽高，若系统支持则会以这个预览宽高进行预览。
      */
     Point targetPreviewSize;
 
     /**
-     * 最大分辨率
+     * 最大分辨率。
      */
     Point maxPreviewSize;
 
     /**
-     * 最小分辨率
+     * 最小分辨率。
      */
     Point minPreviewSize;
 
     /**
-     * 上下文，用于获取 CameraManager
+     * 上下文，用于获取 CameraManager。
      */
     Context context;
 

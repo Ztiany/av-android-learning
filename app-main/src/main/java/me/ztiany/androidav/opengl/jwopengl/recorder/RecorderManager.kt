@@ -7,9 +7,9 @@ import android.util.Size
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
-import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.Encoder
-import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.HardEncoder
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.GLFilter
+import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
+import me.ztiany.androidav.opengl.jwopengl.encoder.HardEncoder
+import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 

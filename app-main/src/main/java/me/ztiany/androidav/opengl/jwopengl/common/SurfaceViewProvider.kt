@@ -38,7 +38,13 @@ class SurfaceViewProvider(private val surfaceView: SurfaceView) : SurfaceProvide
                 width: Int,
                 height: Int
             ) {
-                Timber.d("surfaceChanged() called with: holder = $holder, format = $format, width = $width, height = $height")
+                Timber.d(
+                    "surfaceChanged() called with: holder = %s, format = %d, width = %d, height = %d",
+                    holder,
+                    format,
+                    width,
+                    height
+                )
                 surfaceProviderCallback.onSurfaceChanged(holder.surface, width, height)
             }
 

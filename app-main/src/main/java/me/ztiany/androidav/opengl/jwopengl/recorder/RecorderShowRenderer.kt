@@ -11,9 +11,9 @@ import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.gles2.generateTexture
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.GLFilter
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.NoneEffectFBOFilter
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.ScreenFilter
+import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
+import me.ztiany.androidav.opengl.jwopengl.filter.NoneEffectFBOFilter
+import me.ztiany.androidav.opengl.jwopengl.filter.ScreenFilter
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 

@@ -9,8 +9,8 @@ import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProvider
 import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProviderCallback
 import me.ztiany.androidav.opengl.jwopengl.egl14.*
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
-import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.Encoder
-import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.EncoderMode
+import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
+import me.ztiany.androidav.opengl.jwopengl.encoder.EncoderMode
 import timber.log.Timber
 
 /** 渲染的是 FBO 中的纹理，使用标准的坐标系 */

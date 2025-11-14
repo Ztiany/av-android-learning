@@ -33,16 +33,21 @@ class TriangleRenderer : GLRenderer {
 
     override fun onSurfaceCreated() {
         //申请 native 空间
-        vertexBuffer = ByteBuffer.allocateDirect(triangleCoordinate.size * 4 /*one float has four bytes.*/)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(triangleCoordinate).also {
-                it.position(0)
-            }//将坐标数据转换为 FloatBuffer
+        vertexBuffer =
+            ByteBuffer.allocateDirect(triangleCoordinate.size * 4 /*one float has four bytes.*/)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer()
+                .put(triangleCoordinate).also {
+                    it.position(0)
+                }//将坐标数据转换为 FloatBuffer
 
         //生成 Shader
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, FileUtils.loadAssets("shader/vertex_base.glsl"))
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, FileUtils.loadAssets("shader/fragment_color.glsl"))
+        val vertexShader =
+            loadShader(GLES20.GL_VERTEX_SHADER, FileUtils.loadAssets("shader/vertex_base.glsl"))
+        val fragmentShader = loadShader(
+            GLES20.GL_FRAGMENT_SHADER,
+            FileUtils.loadAssets("shader/fragment_color.glsl")
+        )
 
         //创建一个空的OpenGLES程序
         program = GLES20.glCreateProgram()
@@ -63,7 +68,7 @@ class TriangleRenderer : GLRenderer {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame(attachment: Any? ) {
+    override fun onDrawFrame(attachment: Any?) {
         //清理
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -73,7 +78,14 @@ class TriangleRenderer : GLRenderer {
         //启用三角形顶点的句柄
         GLES20.glEnableVertexAttribArray(aPositionHandle)
         //准备三角形的坐标数据：CPU -> GPU
-        GLES20.glVertexAttribPointer(aPositionHandle, 3, GLES20.GL_FLOAT, false/*自动修正，不需要*/, 12/*3 * 4*/, vertexBuffer)
+        GLES20.glVertexAttribPointer(
+            aPositionHandle,
+            3,
+            GLES20.GL_FLOAT,
+            false/*自动修正，不需要*/,
+            12/*3 * 4*/,
+            vertexBuffer
+        )
 
         //设置绘制三角形的颜色
         GLES20.glUniform4fv(uColorHandle, 1/*4fv，所以是 1*/, color, 0)

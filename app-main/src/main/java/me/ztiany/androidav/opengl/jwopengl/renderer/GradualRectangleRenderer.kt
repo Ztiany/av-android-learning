@@ -10,7 +10,7 @@ class GradualRectangleRenderer : GLRenderer {
 
     private lateinit var program: GLProgram
 
-    /*四个点的颜色*/
+    /** 四个点的颜色 */
     private val vertexColor = floatArrayOf(
         1.0F, 0.0F, 0.0F, 1.0F,
         0.0F, 1.0F, 0.0F, 1.0F,
@@ -18,14 +18,14 @@ class GradualRectangleRenderer : GLRenderer {
         1.0F, 1.0F, 1.0F, 1.0F,
     )
 
-    /*矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(
         newVertexCoordinateFull3().map {
             it * 0.8F
         }.toFloatArray()
     )
 
-    /*矩形的坐标颜色*/
+    /** 矩形的坐标颜色 */
     private val colorBuffer = generateVBOBuffer(vertexColor)
 
     override fun onSurfaceCreated() {

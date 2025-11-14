@@ -11,14 +11,14 @@ class TextureRenderer : GLRenderer {
     private lateinit var program: GLProgram
     private lateinit var glTexture: GLTexture
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(
         newVertexCoordinateFull3().map {
             it * 0.8F
         }.toFloatArray()
     )
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onSurfaceCreated() {

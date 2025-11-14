@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.filter
+package me.ztiany.androidav.opengl.jwopengl.filter
 
 import android.opengl.GLES20
 import android.opengl.Matrix
@@ -9,13 +9,13 @@ class NoneEffectFBOFilter : BaseGLFilter() {
 
     private var glFBO: GLFBOWithTexture? = null
 
-    /**用于修正坐标位置*/
+    /** 用于修正坐标位置 */
     private val glMVPMatrix = GLMVPMatrix()
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun createAndInitProgram(): GLProgram {

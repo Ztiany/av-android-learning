@@ -6,6 +6,11 @@ import android.util.Size
 import android.widget.Toast
 import androidx.core.view.doOnLayout
 import me.ztiany.androidav.databinding.OpenglActivityRecorderBinding
+import me.ztiany.androidav.opengl.jwopengl.filter.BeautifyFilter
+import me.ztiany.androidav.opengl.jwopengl.filter.EffectSoulFilter
+import me.ztiany.androidav.opengl.jwopengl.filter.EffectSplit2Filter
+import me.ztiany.androidav.opengl.jwopengl.filter.EffectSplit3Filter
+import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
 import me.ztiany.androidav.opengl.jwopengl.recorder.RecorderManager
 import me.ztiany.androidav.opengl.jwopengl.recorder.Speed
 import me.ztiany.androidav.opengl.jwopengl.recorder.filter.*

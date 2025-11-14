@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.encoder
+package me.ztiany.androidav.opengl.jwopengl.encoder
 
 import android.view.Surface
 
@@ -26,17 +26,6 @@ interface Encoder {
 
 }
 
-abstract class AbstractEncoder : Encoder {
-
-    override fun getInputSurfaceView(): Surface {
-        throw UnsupportedOperationException("not implemented.")
-    }
-
-    override fun onFrame() {
-
-    }
-
-}
 
 enum class EncoderMode {
     Hard, Soft

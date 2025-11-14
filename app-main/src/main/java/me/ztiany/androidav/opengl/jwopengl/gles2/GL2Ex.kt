@@ -97,36 +97,36 @@ fun loadShaderFromAssets(type: Int, path: String): Int {
     return loadShader(type, FileUtils.loadAssets(path))
 }
 
-fun loadVertexShaderFromAssets(type: Int, path: String): Int {
+fun loadVertexShaderFromAssets(path: String): Int {
     return loadShaderFromAssets(GLES20.GL_VERTEX_SHADER, path)
 }
 
-fun loadFragmentShaderFromAssets(type: Int, path: String): Int {
+fun loadFragmentShaderFromAssets(path: String): Int {
     return loadShaderFromAssets(GLES20.GL_FRAGMENT_SHADER, path)
 }
 
 fun generateGLProgram(vertexSource: String, fragmentSource: String): Int {
-    //创建着色器程序
+    // 创建着色器程序
     val program = GLES20.glCreateProgram()
 
-    //加载着色器
+    // 加载着色器
     val vShader = loadVertexShader(vertexSource)
     val fShader = loadFragmentShader(fragmentSource)
 
-    //绑定着色器
+    // 绑定着色器
     GLES20.glAttachShader(program, vShader)
     GLES20.glAttachShader(program, fShader)
-    //连接到着色器程序
+    // 连接到着色器程序
     GLES20.glLinkProgram(program)
 
-    //检测状态
+    // 检测状态
     val status = IntArray(1)
     GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, status, 0);
     if (status[0] != GLES20.GL_TRUE) {
         throw IllegalStateException("link program:" + GLES20.glGetProgramInfoLog(program));
     }
 
-    //释放资源
+    // 释放资源
     GLES20.glDeleteShader(vShader)
     GLES20.glDeleteShader(fShader)
     return program

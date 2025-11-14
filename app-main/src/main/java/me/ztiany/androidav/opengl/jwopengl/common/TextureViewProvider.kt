@@ -31,29 +31,29 @@ class TextureViewProvider(private val textureView: TextureView) : SurfaceProvide
 
         textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
 
-            override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-                Timber.d("onSurfaceTextureAvailable $surface")
-                this@TextureViewProvider.surface = Surface(surface)
+            override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
+                Timber.d("onSurfaceTextureAvailable $surfaceTexture")
+                this@TextureViewProvider.surface = Surface(surfaceTexture)
                 this@TextureViewProvider.surface?.let {
                     surfaceProviderCallback.onSurfaceAvailable(it)
                     surfaceProviderCallback.onSurfaceChanged(it, width, height)
                 }
             }
 
-            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-                Timber.d("onSurfaceTextureSizeChanged $surface")
+            override fun onSurfaceTextureSizeChanged(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
+                Timber.d("onSurfaceTextureSizeChanged $surfaceTexture")
                 this@TextureViewProvider.surface?.let {
                     surfaceProviderCallback.onSurfaceChanged(it, width, height)
                 }
             }
 
-            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-                Timber.d("onSurfaceTextureDestroyed $surface")
+            override fun onSurfaceTextureDestroyed(surfaceTexture: SurfaceTexture): Boolean {
+                Timber.d("onSurfaceTextureDestroyed $surfaceTexture")
                 surfaceProviderCallback.onSurfaceDestroyed()
                 return true
             }
 
-            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+            override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) {
 
             }
 

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.filter
+package me.ztiany.androidav.opengl.jwopengl.filter
 
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 

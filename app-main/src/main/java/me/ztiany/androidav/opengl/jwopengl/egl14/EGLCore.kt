@@ -29,17 +29,16 @@ class EGLCore {
         eglDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
         if (eglDisplay == EGL14.EGL_NO_DISPLAY) {
             throw IllegalStateException("eglGetDisplay failed")
-        } else {
-            Timber.d("eglGetDisplay succeeded")
         }
+        Timber.d("eglGetDisplay succeeded")
 
         // 初始化 display
         val version = IntArray(2)
         if (!EGL14.eglInitialize(eglDisplay, version, 0, version, 1)) {
             throw IllegalStateException("eglInitialize failed");
-        } else {
-            Timber.d("eglInitialize succeeded")
         }
+        Timber.d("eglInitialize succeeded")
+
 
         // 配置 egl 的属性，格式：[key, value, key, value, ... , EGL14.EGL_NONE]，必须以 EGL14.EGL_NONE 结尾。
         val eglConfigAttributes = intArrayOf(
@@ -65,10 +64,12 @@ class EGLCore {
             ) || eglConfigs[0] == null
         ) {
             throw IllegalStateException("eglChooseConfig failed")
-        } else {
-            eglConfig = eglConfigs[0]
-            Timber.d("eglChooseConfig succeeded")
         }
+        eglConfig = eglConfigs[0]
+        if (eglConfig == EGL14.EGL_NO_CONTEXT) {
+            throw IllegalStateException("eglCreateContext failed")
+        }
+        Timber.d("eglChooseConfig succeeded")
 
         // 创建 Context。
         val contextAttributes = intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE)
@@ -80,15 +81,15 @@ class EGLCore {
                 contextAttributes,
                 0
             )
-        } catch (t: Throwable) {
-            Timber.e(t)
+        } catch (throwable: Throwable) {
+            Timber.e(throwable)
         }
-        if (eglConfig == EGL14.EGL_NO_CONTEXT) {
+
+        if (eglContext == EGL14.EGL_NO_CONTEXT) {
             throw IllegalStateException("eglCreateContext failed")
-        } else {
-            eglConfig = eglConfigs[0]
-            Timber.d("eglCreateContext succeeded")
         }
+
+        Timber.d("eglCreateContext succeeded")
     }
 
     /**
@@ -109,7 +110,7 @@ class EGLCore {
             0
         )
         if (eglSurface == EGL14.EGL_NO_SURFACE) {
-            throw IllegalStateException("eglCreateContext failed")
+            throw IllegalStateException("makeEglWindowSurface failed")
         }
     }
 
@@ -140,7 +141,7 @@ class EGLCore {
 
     fun makeCurrent() {
         if (!EGL14.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
-            throw IllegalStateException("eglCreateContext failed")
+            throw IllegalStateException("eglMakeCurrent failed")
         }
         hasSetUPCurrent = true
     }

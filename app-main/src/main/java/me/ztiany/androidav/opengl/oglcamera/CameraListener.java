@@ -9,7 +9,7 @@ public interface CameraListener {
      * 当打开时执行。
      *
      * @param camera             相机实例
-     * @param cameraId           相机ID
+     * @param cameraId           相机 ID
      * @param displayOrientation 相机预览旋转角度
      */
     void onCameraOpened(ICamera camera, String cameraId, Size previewSize, int displayOrientation);

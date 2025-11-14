@@ -22,9 +22,9 @@ class EGLEnvironment(
         private const val MSG_EGL_SURFACE_DESTROYED = 4
         private const val MSG_EGL_SURFACE_RELEASE = 5
 
-        private const val MSG_RENDERER_SURFACE_CREATED = 105
-        private const val MSG_RENDERER_SURFACE_CHANGED = 106
-        private const val MSG_RENDERER_DRAW = 107
+        private const val MSG_RENDERER_SURFACE_CREATED = 101
+        private const val MSG_RENDERER_SURFACE_CHANGED = 102
+        private const val MSG_RENDERER_DRAW = 103
     }
 
     private val eglThread = HandlerThread("EGLEnvironment")
@@ -89,10 +89,10 @@ class EGLEnvironment(
     }
 
     private fun handleMessage(message: Message): Boolean {
-        if (message.what <= 100) {
-            handleEGLMessage(message)
-        } else {
+        if (message.what >= MSG_RENDERER_SURFACE_CREATED) {
             handleRendererMessage(message)
+        } else {
+            handleEGLMessage(message)
         }
         return true
     }
@@ -103,12 +103,14 @@ class EGLEnvironment(
                 Timber.d("handleEGLMessage MSG_EGL_INIT")
                 eglCore.makeEglContext(eglAttribute.sharedContext)
             }
+
             MSG_EGL_NEW_SURFACE -> {
                 Timber.d("handleEGLMessage MSG_EGL_NEW_SURFACE")
                 eglCore.makeEglWindowSurface(message.obj as Surface)
                 eglCore.makeCurrent()
                 eglHandler.sendEmptyMessage(MSG_RENDERER_SURFACE_CREATED)
             }
+
             MSG_EGL_SURFACE_REFRESH -> {
                 Timber.d("handleEGLMessage MSG_EGL_SURFACE_REFRESH")
                 //egl doesn't need to do anything.
@@ -123,11 +125,13 @@ class EGLEnvironment(
                     eglHandler.sendEmptyMessage(MSG_RENDERER_DRAW)
                 }
             }
+
             MSG_EGL_SURFACE_DESTROYED -> {
                 Timber.d("handleEGLMessage MSG_EGL_SURFACE_DESTROYED")
                 glRenderer.onSurfaceDestroy()
                 eglCore.destroySurface()
             }
+
             MSG_EGL_SURFACE_RELEASE -> {
                 Timber.d("handleEGLMessage MSG_EGL_SURFACE_RELEASE")
                 eglCore.release()
@@ -143,12 +147,14 @@ class EGLEnvironment(
                     glRenderer.onSurfaceCreated()
                 }
             }
+
             MSG_RENDERER_SURFACE_CHANGED -> {
                 Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CHANGED")
                 if (eglCore.isActive() && surfaceAvailable) {
                     glRenderer.onSurfaceChanged(message.arg1, message.arg2)
                 }
             }
+
             MSG_RENDERER_DRAW -> {
                 if (eglCore.isActive() && surfaceAvailable) {
                     glRenderer.onDrawFrame(message.obj)

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.encoder
+package me.ztiany.androidav.opengl.jwopengl.encoder
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo

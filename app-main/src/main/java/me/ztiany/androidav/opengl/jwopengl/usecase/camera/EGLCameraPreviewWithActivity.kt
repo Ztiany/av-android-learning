@@ -109,9 +109,8 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
             .previewViewSize(point)
             .targetPreviewSize(Point(800, 480))
             .rotation(windowManager.defaultDisplay.rotation)
-            .build("2").also {
-                it.start()
-            }
+            .build("2")
+            .also { it.start() }
     }
 
     override fun onResume() {

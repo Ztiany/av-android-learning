@@ -1,11 +1,11 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.filter
+package me.ztiany.androidav.opengl.jwopengl.filter
 
 import android.opengl.GLES20
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.activeTexture
 
-/**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
+/** 灵魂出鞘效果，注意：其接收来自相机的纹理。*/
 class EffectSoulFilter : BaseEffectFBOFilter() {
 
     private var mixPercent = 0F

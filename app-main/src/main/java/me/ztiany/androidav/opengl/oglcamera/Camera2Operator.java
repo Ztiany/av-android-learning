@@ -30,15 +30,19 @@ import timber.log.Timber;
 public class Camera2Operator implements CameraOperator {
 
     private final Point maxPreviewSize;
+
     private final Point minPreviewSize;
 
     private final int rotation;
+
     private final Point previewViewSize;
+
     private final Point specificPreviewSize;
 
     private String mCameraId;
 
     private String specificCameraId;
+
     private CameraListener mCameraListener;
 
     private Context context;
@@ -106,7 +110,8 @@ public class Camera2Operator implements CameraOperator {
             result = (mSensorOrientation - degrees + 360) % 360;
         }
 
-        Timber.i("getCameraOrientation: rotation = " + rotation + " result = " + result + " mSensorOrientation = " + mSensorOrientation);
+        Timber.i("getCameraOrientation: rotation = " + rotation
+                + " result = " + result + " mSensorOrientation = " + mSensorOrientation);
         return result;
     }
 
@@ -121,7 +126,12 @@ public class Camera2Operator implements CameraOperator {
 
             if (mCameraListener != null) {
                 ContextCompat.getMainExecutor(context).execute(() ->
-                        mCameraListener.onCameraOpened(new Camera2(mCameraDevice), mCameraId, mPreviewSize, getCameraOrientation(rotation, mCameraId))
+                        mCameraListener.onCameraOpened(
+                                new Camera2(mCameraDevice),
+                                mCameraId,
+                                mPreviewSize,
+                                getCameraOrientation(rotation, mCameraId)
+                        )
                 );
             }
         }
@@ -162,7 +172,7 @@ public class Camera2Operator implements CameraOperator {
 
         @Override
         public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-            Timber.i("onConfigured: ");
+            Timber.i("onConfigured is called!");
             // The camera is already closed
             if (null == mCameraDevice) {
                 return;
@@ -176,8 +186,8 @@ public class Camera2Operator implements CameraOperator {
                         new CameraCaptureSession.CaptureCallback() {
                         },
                         mBackgroundHandler);
-            } catch (CameraAccessException e) {
-                Timber.e(e, "setRepeatingRequest");
+            } catch (CameraAccessException cameraAccessException) {
+                Timber.e(cameraAccessException, "setRepeatingRequest");
             }
         }
 
@@ -252,7 +262,7 @@ public class Camera2Operator implements CameraOperator {
         float previewViewRatio;
         if (previewViewSize != null) {//如果设置了预览 View 的宽高，就用它来做对比
             previewViewRatio = (float) previewViewSize.x / (float) previewViewSize.y;
-        } else {//否则就用最佳预览来做对比
+        } else {// 否则就用最佳预览来做对比
             previewViewRatio = (float) bestSize.getWidth() / (float) bestSize.getHeight();
         }
         if (previewViewRatio > 1) {
@@ -261,7 +271,7 @@ public class Camera2Operator implements CameraOperator {
         Timber.d("getBestSupportedSize: previewViewRatio = 1 / previewViewRatio = %f", previewViewRatio);
 
         for (Size s : sizes) {
-            //如果有符合目标尺寸的，就用目标尺寸。
+            // 如果有符合目标尺寸的，就用目标尺寸。
             if (specificPreviewSize != null && specificPreviewSize.x == s.getWidth() && specificPreviewSize.y == s.getHeight()) {
                 Timber.d("getBestSupportedSize: returning %dx%d", s.getWidth(), s.getHeight());
                 return s;
@@ -415,8 +425,8 @@ public class Camera2Operator implements CameraOperator {
             mBackgroundThread.join();
             mBackgroundThread = null;
             mBackgroundHandler = null;
-        } catch (InterruptedException e) {
-            Timber.e(e, "stopBackgroundThread");
+        } catch (InterruptedException interruptedException) {
+            Timber.e(interruptedException, "stopBackgroundThread");
         }
     }
 
@@ -441,8 +451,8 @@ public class Camera2Operator implements CameraOperator {
                     mCaptureStateCallback,
                     mBackgroundHandler
             );
-        } catch (CameraAccessException e) {
-            Timber.e(e, "createCameraPreviewSession");
+        } catch (CameraAccessException cameraAccessException) {
+            Timber.e(cameraAccessException, "createCameraPreviewSession");
         }
     }
 

@@ -13,10 +13,10 @@ class Fixed2TextureRenderer : GLRenderer {
 
     private val mvpMatrix by lazy { GLMVPMatrix() }
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onSurfaceCreated() {

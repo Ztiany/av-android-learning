@@ -1,17 +1,16 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.filter
+package me.ztiany.androidav.opengl.jwopengl.filter
 
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
-/**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
 abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
     private var glFBO: GLFBOWithTexture? = null
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     protected val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     protected val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
     protected var textureWidth = 0

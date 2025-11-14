@@ -12,6 +12,7 @@ class GLProgram(
     private val programHandle = generateGLProgram(vertexSource, fragmentSource)
 
     private val attributeMap = mutableMapOf<String, Int>()
+
     private val uniformMap = mutableMapOf<String, Int>()
 
     companion object {

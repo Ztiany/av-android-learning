@@ -1,24 +1,24 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder.filter
+package me.ztiany.androidav.opengl.jwopengl.filter
 
 import android.opengl.GLES20
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
-/**渲染的是 FBO 中的纹理，使用标准的坐标系。*/
+/** 渲染的是 FBO 中的纹理，使用标准的坐标系。*/
 class ScreenFilter : BaseGLFilter() {
 
     private val glMVPMatrix = GLMVPMatrix()
 
-    /**用于修正相机的方向*/
+    /** 用于修正相机的方向 */
     private var displayOrientation = 0
 
-    /**用于修正相机的镜像【前置】*/
+    /** 用于修正相机的镜像【前置】*/
     private var isFront = false
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
     override fun createAndInitProgram(): GLProgram {
