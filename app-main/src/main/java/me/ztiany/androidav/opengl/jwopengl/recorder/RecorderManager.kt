@@ -36,6 +36,7 @@ class RecorderManager {
         }
         // encode
         encodeRenderer = RecorderEncodeRenderer()
+
         // init the renderer
         showRenderer = RecorderShowRenderer(glSurfaceView.context, object : EGLBridger {
             override fun requestRender() {
@@ -56,11 +57,30 @@ class RecorderManager {
         }
     }
 
-    fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isFront: Boolean, startPreview: (SurfaceTexture) -> Unit) {
-        Timber.d("onCameraAvailable() called with: previewSize = $previewSize, displayOrientation = $displayOrientation, isFront = $isFront")
+    fun onCameraAvailable(
+        previewSize: Size,
+        displayOrientation: Int,
+        isFront: Boolean,
+        startPreview: (SurfaceTexture) -> Unit
+    ) {
+        Timber.d(
+            "onCameraAvailable() called with: previewSize = %s, orientation = %d, isFront = %b",
+            previewSize.toString(),
+            displayOrientation,
+            isFront
+        )
+
         checkIfInitialized()
+
         // provide the renderers texture the video size.
-        val textureAttribute = TextureAttribute(previewSize.width, previewSize.height, displayOrientation, isFront, false)
+        val textureAttribute = TextureAttribute(
+            previewSize.width,
+            previewSize.height,
+            displayOrientation,
+            isFront,
+            false
+        )
+
         showRenderer.setVideoAttribute(textureAttribute)
         encodeRenderer.setVideoAttribute(textureAttribute)
         //start preview.
@@ -111,7 +131,7 @@ class RecorderManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    //config
+    // config
     ///////////////////////////////////////////////////////////////////////////
 
     var speed = Speed.MODE_NORMAL

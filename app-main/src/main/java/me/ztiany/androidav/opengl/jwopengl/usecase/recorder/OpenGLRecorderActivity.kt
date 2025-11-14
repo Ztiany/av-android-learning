@@ -54,12 +54,15 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
     override fun setUpLayout(savedInstanceState: Bundle?) {
         recorderManager.init(binding.openglCameraView)
+
         setUpRecordBtnLogic()
         setUpSpeedBtnLogic()
         setUpEffectBtnLogic()
+
         binding.openglBtnSwitch.setOnClickListener {
             cameraOperator?.switchCamera()
         }
+
         window.decorView.doOnLayout {
             setUpCamera()
         }
@@ -125,9 +128,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
             .context(applicationContext)
             .rotation(windowManager.defaultDisplay.rotation)
             .build("2")
-            .also {
-                it.start()
-            }
+            .also { it.start() }
     }
 
     override fun onResume() {

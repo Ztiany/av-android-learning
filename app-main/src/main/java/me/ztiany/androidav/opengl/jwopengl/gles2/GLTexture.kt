@@ -7,17 +7,17 @@ import android.opengl.GLUtils
 import timber.log.Timber
 
 class GLTexture(
-    /**An allocated id to this Texture.*/
+    /** An allocated id to this Texture. */
     val id: Int,
-    /**The type of this Texture.*/
+    /** The type of this Texture. */
     val type: Int,
-    /**The handle to Vertex Shader。Not necessary, May be 0.*/
+    /** The handle to Vertex Shader。Not necessary, May be 0.*/
     val handleInShader: Int,
-    /**Not necessary, May be 0.*/
+    /** Not necessary, May be 0. */
     val index: Int,
-    /**Not necessary, May be 0.*/
+    /** Not necessary, May be 0. */
     val width: Int,
-    /**Not necessary, May be 0.*/
+    /** Not necessary, May be 0. */
     val height: Int,
 ) {
 

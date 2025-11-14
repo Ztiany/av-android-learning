@@ -16,64 +16,30 @@ import timber.log.Timber
 /** 渲染的是 FBO 中的纹理，使用标准的坐标系 */
 class RecorderEncodeRenderer : GLRenderer {
 
-    /**CPU 着色器程序*/
+    /** CPU 着色器程序 */
     private lateinit var glProgram: GLProgram
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
-    /**自定义的 EGL 环境*/
+    /** 自定义的 EGL 环境 */
     private var eglEnvironment: EGLEnvironment? = null
 
     private var mediaCodecSurfaceProvider: MediaCodecSurfaceProvider? = null
 
-    /**编码器*/
+    /** 编码器 */
     private var encoder: Encoder? = null
 
-    override fun onSurfaceCreated() {
-        Timber.d("onSurfaceCreated() called")
-        glProgram = GLProgram.fromAssets(
-            "shader/vertex_base.glsl",
-            "shader/fragment_texture.glsl"
-        )
+    private var textureWidth = 0
 
-        //vertex
-        glProgram.activeAttribute("aPosition")
-        glProgram.activeAttribute("aTextureCoordinate")
-
-        //fragment
-        glProgram.activeUniform("uTexture")
-    }
-
-    override fun onSurfaceChanged(width: Int, height: Int) {
-        Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
-        GLES20.glViewport(0, 0, width, height)
-    }
-
-    override fun onDrawFrame(attachment: Any?) {
-        val textureWithTime = attachment as? TextureWithTime ?: return
-        glProgram.startDraw {
-            //vertex
-            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
-            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            //fragment
-            textureWithTime.glTexture.activeTexture(uniformHandle("uTexture"))
-            //draw
-            drawArraysStrip(4/*4 个顶点*/)
-            //setTime【按照文档来说，这里其实没有必要设置】
-            eglEnvironment?.setPresentationTime(textureWithTime.timestamp)
-        }
-    }
+    private var textureHeight = 0
 
     override fun onSurfaceDestroy() {
         Timber.d("onSurfaceDestroy")
     }
-
-    private var textureWidth = 0
-    private var textureHeight = 0
 
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
@@ -104,6 +70,7 @@ class RecorderEncodeRenderer : GLRenderer {
     private fun startWithHardEncoder(sharedEGLContext: EGLContext, encoder: Encoder) {
         encoder.start()
         val surfaceProvider = MediaCodecSurfaceProvider(encoder.getInputSurfaceView())
+
         eglEnvironment = EGLEnvironment(
             surfaceProvider,
             EGLAttribute(sharedEGLContext)
@@ -111,6 +78,7 @@ class RecorderEncodeRenderer : GLRenderer {
             renderMode = RenderMode.WhenDirty
             start(this@RecorderEncodeRenderer)
         }
+
         this.mediaCodecSurfaceProvider = surfaceProvider
     }
 
@@ -118,13 +86,56 @@ class RecorderEncodeRenderer : GLRenderer {
         mediaCodecSurfaceProvider?.stop()
         eglEnvironment?.release()
         encoder?.stop()
+
         eglEnvironment = null
         mediaCodecSurfaceProvider = null
         encoder = null
     }
 
     fun onFrame(frame: TextureWithTime) {
+        // RecorderEncodeRenderer.onFrame
+        //           |
+        //          \|/
+        // EglEnvironment.requestRender
+        //           |
+        //          \|/
+        // RecorderEncodeRenderer.onDrawFrame
         eglEnvironment?.requestRender(frame)
+    }
+
+    override fun onSurfaceCreated() {
+        Timber.d("onSurfaceCreated() called")
+        glProgram = GLProgram.fromAssets(
+            "shader/vertex_base.glsl",
+            "shader/fragment_texture.glsl"
+        )
+
+        //vertex
+        glProgram.activeAttribute("aPosition")
+        glProgram.activeAttribute("aTextureCoordinate")
+
+        //fragment
+        glProgram.activeUniform("uTexture")
+    }
+
+    override fun onSurfaceChanged(width: Int, height: Int) {
+        Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
+        GLES20.glViewport(0, 0, width, height)
+    }
+
+    override fun onDrawFrame(attachment: Any?) {
+        val textureWithTime = attachment as? TextureWithTime ?: return
+        glProgram.startDraw {
+            // vertex
+            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
+            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
+            // fragment
+            textureWithTime.glTexture.activeTexture(uniformHandle("uTexture"))
+            // draw
+            drawArraysStrip(4/* 4 个顶点 */)
+            // setTime【按照文档来说，这里其实没有必要设置】
+            eglEnvironment?.setPresentationTime(textureWithTime.timestamp)
+        }
     }
 
     private inner class MediaCodecSurfaceProvider(private val surface: Surface) : SurfaceProvider {

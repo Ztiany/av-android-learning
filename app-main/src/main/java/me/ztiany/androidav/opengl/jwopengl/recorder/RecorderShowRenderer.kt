@@ -23,17 +23,21 @@ class RecorderShowRenderer(
     private val eglBridger: EGLBridger
 ) : GLRenderer {
 
-    /**承载视频的纹理*/
+    /** 承载视频的纹理 */
     private lateinit var cameraSurfaceTexture: SurfaceTexture
+
     private lateinit var cameraTexture: GLTexture
+
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
 
     private val foundationFBOFilter = NoneEffectFBOFilter()
+
     private val foundationScreenFilter = ScreenFilter()
 
     private val effectFilters = CopyOnWriteArrayList<GLFilter>()
 
     @Volatile private var recorder: Recorder? = null
+
     @Volatile private var textureSizeReceived = false
 
     private lateinit var eglContext: EGLContext
@@ -88,8 +92,10 @@ class RecorderShowRenderer(
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
+
         foundationFBOFilter.setWorldSize(width, height)
         foundationScreenFilter.setWorldSize(width, height)
+
         effectFilters.forEach {
             it.setWorldSize(width, height)
         }
@@ -102,18 +108,18 @@ class RecorderShowRenderer(
 
         cameraSurfaceTexture.updateTexImage()
 
-        //draw raw video on fbo
+        // draw raw video on fbo
         var glTexture = foundationFBOFilter.onDrawFrame(cameraTexture)
 
-        //do effect on fbo
+        // do effect on fbo
         effectFilters.forEach {
             glTexture = it.onDrawFrame(glTexture)
         }
 
-        //draw fbo on screen.
+        // draw fbo on screen.
         glTexture = foundationScreenFilter.onDrawFrame(glTexture)
 
-        //send effect to recorder if need.
+        // send effect to recorder if need.
         recorder?.run {
             onFrame(TextureWithTime(glTexture, cameraSurfaceTexture.timestamp))
         }
@@ -131,8 +137,10 @@ class RecorderShowRenderer(
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
         this.attribute = attribute
         textureSizeReceived = true
+
         foundationFBOFilter.setTextureAttribute(attribute)
         foundationScreenFilter.setTextureAttribute(attribute)
+
         effectFilters.forEach {
             it.setTextureAttribute(attribute)
         }
@@ -156,8 +164,8 @@ class RecorderShowRenderer(
 }
 
 class TextureWithTime(
-    /**存储了当前帧的纹理*/
+    /** 存储了当前帧的纹理 */
     val glTexture: GLTexture,
-    /**单位：nanoseconds*/
+    /** 单位：nanoseconds */
     val timestamp: Long
 )

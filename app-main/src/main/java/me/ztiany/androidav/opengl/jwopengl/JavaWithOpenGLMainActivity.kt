@@ -54,7 +54,7 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
             )
         },
 
-        ActivityItem("相机预览+特效+录频（FBO）", OpenGLRecorderActivity::class.java),
+        ActivityItem("相机预览 + 特效 + 录频（FBO）", OpenGLRecorderActivity::class.java),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
