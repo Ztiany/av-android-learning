@@ -20,17 +20,17 @@ class PlayerMainActivity : AppCompatActivity() {
     }
 
     fun setUpView() {
-        //Media Player 视频渲染
+        // Media Player 视频渲染
         binding.playerByMediaPlayer.setOnClickListener {
             startActivity(Intent(this, VideoMediaPlayerActivity::class.java))
         }
 
-        //MediaCodec + SurfaceView 视频渲染
+        // MediaCodec + SurfaceView 视频渲染
         binding.playerByMedicCodec.setOnClickListener {
             startActivity(Intent(this, MediaCodecPlayerActivity::class.java))
         }
 
-        //视频渲染
+        // 视频渲染
         binding.playerByMedicCodecEgl.setOnClickListener {
             startActivity(Intent(this, OpenGNESPlayerActivity::class.java))
         }

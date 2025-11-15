@@ -13,7 +13,6 @@ import me.ztiany.androidav.opengl.jwopengl.filter.EffectSplit3Filter
 import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
 import me.ztiany.androidav.opengl.jwopengl.recorder.RecorderManager
 import me.ztiany.androidav.opengl.jwopengl.recorder.Speed
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.*
 import me.ztiany.androidav.opengl.jwopengl.recorder.getSpeedName
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener

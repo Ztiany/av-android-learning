@@ -1,6 +1,6 @@
 package me.ztiany.androidav.opengl.jwopengl.common
 
-interface EGLBridger {
+interface EGLBridge {
 
     fun requestRender()
 

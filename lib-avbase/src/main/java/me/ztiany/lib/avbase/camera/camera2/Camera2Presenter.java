@@ -201,6 +201,7 @@ public class Camera2Presenter {
 
     public synchronized void start() {
         if (mCameraDevice != null) {
+            Timber.d("already started: mCameraDevice is not null!");
             return;
         }
         startBackgroundThread();
@@ -434,13 +435,6 @@ public class Camera2Presenter {
         List<Surface> targets = new ArrayList<>();
 
         try {
-            // We set up a CaptureRequest.Builder with the output Surface.
-            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mPreviewRequestBuilder.set(
-                    CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
-            );
-
             if (mTextureView != null) {
                 SurfaceTexture texture = mTextureView.getSurfaceTexture();
                 Timber.d("texture is null! no preview session will be created!");
@@ -452,12 +446,10 @@ public class Camera2Presenter {
                     targets.add(surface);
                 }
             }
-
             // added through CameraHandle
             if (outputSurface != null) {
                 targets.add(outputSurface);
             }
-
             // added through OutputProvider
             if (mOutputProvider != null) {
                 Surface providedSurface = mOutputProvider.provideSurface();
@@ -465,11 +457,19 @@ public class Camera2Presenter {
                     targets.add(providedSurface);
                 }
             }
+            if (targets.isEmpty()) {
+                return;
+            }
 
+            // We set up a CaptureRequest.Builder with the output Surface.
+            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            mPreviewRequestBuilder.set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+            );
             for (Surface target : targets) {
                 mPreviewRequestBuilder.addTarget(target);
             }
-
             // Here, we create a CameraCaptureSession for camera preview.
             CameraCaptureSession.StateCallback configureFailed = new CameraCaptureSession.StateCallback() {
                 @Override

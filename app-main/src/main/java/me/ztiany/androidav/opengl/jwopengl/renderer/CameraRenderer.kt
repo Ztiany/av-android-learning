@@ -6,14 +6,14 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
 class CameraRenderer(
     private val context: Context,
-    private val eglBridger: EGLBridger
+    private val eglBridge: EGLBridge
 ) : GLRenderer {
 
     private val glMVPMatrix = GLMVPMatrix()
@@ -99,7 +99,7 @@ class CameraRenderer(
     }
 
     private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        eglBridger.requestRender()
+        eglBridge.requestRender()
     }
 
     fun setVideoAttribute(width: Int, height: Int, displayOrientation: Int, isMirror: Boolean) {

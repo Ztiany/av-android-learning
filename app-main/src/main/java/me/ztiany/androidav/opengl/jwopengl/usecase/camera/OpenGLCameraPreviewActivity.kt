@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Size
 import androidx.core.view.doOnLayout
 import me.ztiany.androidav.databinding.OpenglActivityCameraPreviewBinding
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.renderer.CameraRenderer
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
@@ -54,7 +54,7 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
     private fun setUpGlSurfaceView() {
         binding.openglCameraView.setEGLContextClientVersion(2)
 
-        cameraRenderer = CameraRenderer(this, object : EGLBridger {
+        cameraRenderer = CameraRenderer(this, object : EGLBridge {
             override fun requestRender() {
                 binding.openglCameraView.requestRender()
             }

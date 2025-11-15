@@ -6,7 +6,7 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.lib.avbase.utils.av.MediaMetadata
@@ -14,23 +14,24 @@ import timber.log.Timber
 
 class MediaPlayerRenderer(
     private val context: Context,
-    private val eglBridger: EGLBridger
+    private val eglBridge: EGLBridge
 ) : GLRenderer {
 
     private val glMVPMatrix = GLMVPMatrix()
+
     private lateinit var glProgram: GLProgram
     private lateinit var glTexture: GLTexture
 
-    /**用于修正视频的方向*/
+    /** 用于修正视频的方向 */
     private var displayOrientation = 0
 
-    /**承载视频的纹理*/
+    /** 承载视频的纹理 */
     private lateinit var surfaceTexture: SurfaceTexture
 
-    /**矩形的坐标*/
+    /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
-    /**纹理坐标*/
+    /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
@@ -98,7 +99,7 @@ class MediaPlayerRenderer(
     }
 
     private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        eglBridger.requestRender()
+        eglBridge.requestRender()
     }
 
     private fun adjustMatrix() {
@@ -106,7 +107,14 @@ class MediaPlayerRenderer(
         glMVPMatrix.adjustToOrthogonal()
         glMVPMatrix.resetToIdentity(glMVPMatrix.modelMatrix)
         if (adjustVideoOrientation) {
-            Matrix.rotateM(glMVPMatrix.modelMatrix, 0, -this.displayOrientation.toFloat(), 0F, 0F, 1F)
+            Matrix.rotateM(
+                glMVPMatrix.modelMatrix,
+                0,
+                -this.displayOrientation.toFloat(),
+                0F,
+                0F,
+                1F
+            )
         }
         glMVPMatrix.combineMVP()
     }

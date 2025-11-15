@@ -8,7 +8,7 @@ import me.ztiany.lib.avbase.utils.av.loadMediaMetadata
 import timber.log.Timber
 import java.nio.ByteBuffer
 
-/** 实验发现，下面实现会崩溃。 */
+/** 实验发现，本实现会崩溃。 */
 @Deprecated("This implementation can not work properly.")
 class MediaDataExtractorImpl(
     private val context: Context

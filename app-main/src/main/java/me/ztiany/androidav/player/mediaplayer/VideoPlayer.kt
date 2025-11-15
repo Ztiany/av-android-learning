@@ -5,7 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 
-class VideoPlayer : MediaPlayer(), MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
+class VideoPlayer : MediaPlayer(), MediaPlayer.OnCompletionListener,
+    MediaPlayer.OnSeekCompleteListener {
 
     companion object {
         private const val MSG_UPDATE = 101
@@ -22,6 +23,7 @@ class VideoPlayer : MediaPlayer(), MediaPlayer.OnCompletionListener, MediaPlayer
                     sendEmptyMessageDelayed(MSG_UPDATE, UPDATE_INTERVAL.toLong())
                     listener?.onPlayerUpdate(1.0f * currentPosition / duration)
                 }
+
                 else -> {
                 }
             }

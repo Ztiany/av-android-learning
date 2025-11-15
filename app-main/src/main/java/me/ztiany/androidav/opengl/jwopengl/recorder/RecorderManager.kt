@@ -4,7 +4,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.EGLContext
 import android.opengl.GLSurfaceView
 import android.util.Size
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
@@ -38,7 +38,7 @@ class RecorderManager {
         encodeRenderer = RecorderEncodeRenderer()
 
         // init the renderer
-        showRenderer = RecorderShowRenderer(glSurfaceView.context, object : EGLBridger {
+        showRenderer = RecorderShowRenderer(glSurfaceView.context, object : EGLBridge {
             override fun requestRender() {
                 glSurfaceView.requestRender()
             }
@@ -84,9 +84,7 @@ class RecorderManager {
         showRenderer.setVideoAttribute(textureAttribute)
         encodeRenderer.setVideoAttribute(textureAttribute)
         //start preview.
-        showRenderer.getSurfaceTexture {
-            startPreview(it)
-        }
+        showRenderer.getSurfaceTexture { startPreview(it) }
     }
 
     fun startRecording(path: String) {

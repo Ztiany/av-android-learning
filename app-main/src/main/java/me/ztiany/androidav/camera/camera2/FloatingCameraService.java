@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraDevice;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -39,7 +38,7 @@ public class FloatingCameraService extends Service {
 
     private TextureView mTextureView;
 
-    private Camera2Presenter mCamera2Helper;
+    private Camera2Presenter mCamera2Presenter;
 
     private View mFloatingView;
 
@@ -171,10 +170,10 @@ public class FloatingCameraService extends Service {
     }
 
     private void startCamera() {
-        if (mCamera2Helper == null) {
+        if (mCamera2Presenter == null) {
             mMediaRecorderProvider = new MediaRecorderProvider();
 
-            mCamera2Helper = new Camera2Presenter.Builder()
+            mCamera2Presenter = new Camera2Presenter.Builder()
                     .context(getApplicationContext())
                     .cameraListener(mCamera2Listener)
                     .cameraId(CameraId.BACK)
@@ -190,7 +189,7 @@ public class FloatingCameraService extends Service {
                     .rotation(((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation())
                     .build();
         }
-        mCamera2Helper.start();
+        mCamera2Presenter.start();
     }
 
     @Override
@@ -212,14 +211,14 @@ public class FloatingCameraService extends Service {
     }
 
     private void stopCamera() {
-        if (mCamera2Helper != null) {
-            mCamera2Helper.stop();
+        if (mCamera2Presenter != null) {
+            mCamera2Presenter.stop();
         }
     }
 
     private void destroyCamera() {
-        if (mCamera2Helper != null) {
-            mCamera2Helper.release();
+        if (mCamera2Presenter != null) {
+            mCamera2Presenter.release();
         }
     }
 

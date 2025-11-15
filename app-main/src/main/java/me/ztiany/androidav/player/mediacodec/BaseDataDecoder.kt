@@ -118,6 +118,7 @@ abstract class BaseDataDecoder(
                     stop()
                     break
                 }
+
                 stateHolder.isPaused -> handleOnPause(lock, condition, onPause, onWakeUp)
                 stateHolder.isStarted -> {
                     task()
@@ -190,7 +191,13 @@ abstract class BaseDataDecoder(
         val readSize = provider.readPacket(byteBuffer, packInfo)
 
         if (readSize < 0) {
-            decoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+            decoder.queueInputBuffer(
+                inputBufferIndex,
+                0,
+                0,
+                0,
+                MediaCodec.BUFFER_FLAG_END_OF_STREAM
+            )
             inputDone.set(true)
             Timber.d("Decoder pushData reach EOF")
         } else {
@@ -211,19 +218,23 @@ abstract class BaseDataDecoder(
                 Timber.d("Decoder INFO_TRY_AGAIN_LATER")
                 return
             }
+
             index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> {
                 Timber.d("Decoder INFO_OUTPUT_BUFFERS_CHANGED")
             }
+
             index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                 val outputFormat = decoder.outputFormat
                 //It's not necessary to update format.
                 //renderer.updateMediaFormat(outputFormat)
                 Timber.d("Decoder INFO_OUTPUT_FORMAT_CHANGED with $outputFormat")
             }
+
             outputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0 -> {
                 Timber.d("Decoder pullData reach EOS")
                 outputDone.set(true)
             }
+
             index >= 0 -> {
                 doSync()
 
@@ -251,7 +262,13 @@ abstract class BaseDataDecoder(
         }
     }
 
-    abstract fun deliverFrame(decoder: MediaCodec, renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int)
+    abstract fun deliverFrame(
+        decoder: MediaCodec,
+        renderer: MediaDataRenderer,
+        data: ByteBuffer,
+        outputBufferInfo: MediaCodec.BufferInfo,
+        index: Int
+    )
 
     private fun getCurrentPts(): Long {
         return outputBufferInfo.presentationTimeUs / 1000

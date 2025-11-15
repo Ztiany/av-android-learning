@@ -79,7 +79,7 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
             renderMode = RenderMode.WhenDirty
         }
 
-        val cameraRenderer = CameraRenderer(this, object : EGLBridger {
+        val cameraRenderer = CameraRenderer(this, object : EGLBridge {
             override fun requestRender() {
                 eglEnvironment.requestRender()
             }

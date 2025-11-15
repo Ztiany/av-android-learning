@@ -6,7 +6,7 @@ import android.opengl.EGL14
 import android.opengl.EGLContext
 import android.opengl.GLES11Ext
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 /** 录像特效 + 展示 */
 class RecorderShowRenderer(
     private val context: Context,
-    private val eglBridger: EGLBridger
+    private val eglBridge: EGLBridge
 ) : GLRenderer {
 
     /** 承载视频的纹理 */
@@ -130,7 +130,7 @@ class RecorderShowRenderer(
     }
 
     private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        eglBridger.requestRender()
+        eglBridge.requestRender()
     }
 
     fun setVideoAttribute(attribute: TextureAttribute) {

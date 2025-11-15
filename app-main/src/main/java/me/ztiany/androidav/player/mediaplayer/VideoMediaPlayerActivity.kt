@@ -10,7 +10,7 @@ import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.lib.avbase.app.activity.BaseActivity
 import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
@@ -70,7 +70,10 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
         }
 
         binding.videoSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) = Unit
+            override fun onProgressChanged(
+                seekBar: SeekBar,
+                progress: Int, fromUser: Boolean
+            ) = Unit
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
                 isTrackingTouching = true
@@ -84,11 +87,13 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
     }
 
     private fun setUpGLSurfaceView() {
-        val mediaPlayerRenderer = MediaPlayerRenderer(this, object : EGLBridger {
-            override fun requestRender() {
-                binding.videoGlSurfaceView.requestRender()
-            }
-        })
+        val mediaPlayerRenderer = MediaPlayerRenderer(
+            this,
+            object : EGLBridge {
+                override fun requestRender() {
+                    binding.videoGlSurfaceView.requestRender()
+                }
+            })
         glRenderer = mediaPlayerRenderer
 
         with(binding.videoGlSurfaceView) {
@@ -139,7 +144,9 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
     private fun formatVideoTime(time: Long): String {
         if (time > 0) {
             val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time))
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(
+                TimeUnit.MILLISECONDS.toMinutes(time)
+            )
             return String.format("%d:%02d", minutes, seconds)
         }
         return "0:00"
