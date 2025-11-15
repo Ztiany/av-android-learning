@@ -1,10 +1,11 @@
 package me.ztiany.lib.avbase.camera.camera2;
 
+import static me.ztiany.lib.avbase.camera.camera2.PreviewTransformer.configureTransform;
+import static me.ztiany.lib.avbase.camera.camera2.PreviewTransformer.getCameraOrientation;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -57,6 +58,7 @@ public class Camera2Presenter {
 
     private Camera2Listener mCamera2Listener;
 
+    @Nullable
     private TextureView mTextureView;
 
     private final boolean mFitPreview;
@@ -75,7 +77,8 @@ public class Camera2Presenter {
 
     private Camera2Presenter(Builder builder) {
         mTextureView = builder.previewView;
-        mFitPreview = builder.fitPreview;
+        mFitPreview = builder.fitPreview && mTextureView != null;
+
 
         mSpecifiedCameraId = builder.specifiedCameraId;
         mCameraSelector = builder.cameraSelector;
@@ -89,7 +92,7 @@ public class Camera2Presenter {
 
         mContext = builder.context;
 
-        if (mIsMirror) {
+        if (mTextureView != null && mIsMirror) {
             mTextureView.setScaleX(-1);
         }
 
@@ -105,67 +108,6 @@ public class Camera2Presenter {
         stop();
         start();
     }
-
-    private int getCameraOrientation(int rotation, String cameraId) {
-        Timber.d("getCameraOrientation() called with: rotation = ["
-                + rotation + "], cameraId = [" + cameraId + "]");
-
-        int degrees = rotation * 90;
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                degrees = 0;
-                break;
-            case Surface.ROTATION_90:
-                degrees = 90;
-                break;
-            case Surface.ROTATION_180:
-                degrees = 180;
-                break;
-            case Surface.ROTATION_270:
-                degrees = 270;
-                break;
-            default:
-                break;
-        }
-        int result;
-
-        if (CameraId.FRONT.equals(cameraId)) {
-            result = (mSensorOrientation + degrees) % 360;
-            result = (360 - result) % 360;
-        } else {
-            result = (mSensorOrientation - degrees + 360) % 360;
-        }
-
-        Timber.d("getCameraOrientation: rotation = " + rotation + " result = "
-                + result + " sensorOrientation = " + mSensorOrientation);
-        return result;
-    }
-
-    private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
-
-        @Override
-        public void onSurfaceTextureAvailable(@NonNull SurfaceTexture texture, int width, int height) {
-            Timber.d("onSurfaceTextureAvailable: %d, %d", width, height);
-            openCamera();
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture texture, int width, int height) {
-            Timber.d("onSurfaceTextureSizeChanged: %d, %d", width, height);
-            configureTransform(width, height);
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture texture) {
-            Timber.d("onSurfaceTextureDestroyed: ");
-            return true;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(@NonNull SurfaceTexture texture) {
-        }
-
-    };
 
     private final CameraDevice.StateCallback mDeviceStateCallback = new CameraDevice.StateCallback() {
 
@@ -183,7 +125,7 @@ public class Camera2Presenter {
                         cameraDevice,
                         mCameraId,
                         mPreviewSize,
-                        getCameraOrientation(mRotation, mCameraId),
+                        getCameraOrientation(mSensorOrientation, mRotation, mCameraId),
                         mIsMirror
                 );
                 mCamera2Listener.onCameraOpened(cameraData);
@@ -262,6 +204,10 @@ public class Camera2Presenter {
             return;
         }
         startBackgroundThread();
+        if (mTextureView == null) {
+            openCamera();
+            return;
+        }
 
         // When the screen is turned off and turned back on, the SurfaceTexture is already
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
@@ -270,7 +216,33 @@ public class Camera2Presenter {
         if (mTextureView.isAvailable()) {
             openCamera();
         } else {
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+            mTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+
+                @Override
+                public void onSurfaceTextureAvailable(@NonNull SurfaceTexture texture, int width, int height) {
+                    Timber.d("onSurfaceTextureAvailable: %d, %d", width, height);
+                    openCamera();
+                }
+
+                @Override
+                public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture texture, int width, int height) {
+                    Timber.d("onSurfaceTextureSizeChanged: %d, %d", width, height);
+                    if (mFitPreview) {
+                        configureTransform(mTextureView, mPreviewSize, mSensorOrientation, mRotation, mCameraId, width, height);
+                    }
+                }
+
+                @Override
+                public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture texture) {
+                    Timber.d("onSurfaceTextureDestroyed: ");
+                    return true;
+                }
+
+                @Override
+                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture texture) {
+                }
+
+            });
         }
     }
 
@@ -331,7 +303,7 @@ public class Camera2Presenter {
         if (mOutputProvider != null) {
             mOutputProvider.onAttach(mCamera2Handle, new OutputProvider.Components() {
                 {
-                    put(OutputProvider.ORIENTATION, getCameraOrientation(mRotation, cameraId));
+                    put(OutputProvider.ORIENTATION, getCameraOrientation(mSensorOrientation, mRotation, cameraId));
                     put(OutputProvider.PREVIEW_SIZE, mPreviewSize);
                     put(OutputProvider.WORKER, mBackgroundHandler);
                     put(OutputProvider.STREAM_CONFIGURATION, configurationMap);
@@ -362,7 +334,17 @@ public class Camera2Presenter {
 
             if (setUpCameraOutputs(cameraManager)) {
                 Timber.d("do open camera: %s", mCameraId);
-                configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+                if (mFitPreview && mTextureView != null) {
+                    configureTransform(
+                            mTextureView,
+                            mPreviewSize,
+                            mSensorOrientation,
+                            mRotation,
+                            mCameraId,
+                            mTextureView.getWidth(),
+                            mTextureView.getHeight()
+                    );
+                }
                 cameraManager.openCamera(mCameraId, mDeviceStateCallback, mBackgroundHandler);
             } else {
                 mCameraOpenCloseLock.release();
@@ -449,33 +431,33 @@ public class Camera2Presenter {
             @Nullable CameraCaptureSession.StateCallback callback
     ) {
         closeCameraSession();
-
-        SurfaceTexture texture = mTextureView.getSurfaceTexture();
-        if (texture == null) {
-            Timber.w("texture is null! no preview session will be created!");
-            return;
-        }
+        List<Surface> targets = new ArrayList<>();
 
         try {
-            // We configure the size of default buffer to be the size of camera preview we want.
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            // This is the output Surface we need to start preview.
-            Surface surface = new Surface(texture);
-
             // We set up a CaptureRequest.Builder with the output Surface.
             mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
             mPreviewRequestBuilder.set(
                     CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
             );
 
-            List<Surface> targets = new ArrayList<>();
-            targets.add(surface);
+            if (mTextureView != null) {
+                SurfaceTexture texture = mTextureView.getSurfaceTexture();
+                Timber.d("texture is null! no preview session will be created!");
+                if (texture != null) {
+                    // We configure the size of default buffer to be the size of camera preview we want.
+                    texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                    // This is the output Surface we need to start preview.
+                    Surface surface = new Surface(texture);
+                    targets.add(surface);
+                }
+            }
+
             // added through CameraHandle
             if (outputSurface != null) {
                 targets.add(outputSurface);
             }
+
             // added through OutputProvider
             if (mOutputProvider != null) {
                 Surface providedSurface = mOutputProvider.provideSurface();
@@ -587,69 +569,6 @@ public class Camera2Presenter {
         }
     }
 
-    /**
-     * Configures the necessary {@link Matrix} transformation to `mTextureView`.
-     * This method should be called after the camera preview size is determined and the
-     * size of `mTextureView` is fixed.
-     *
-     * <p>
-     * This method's purpose is to correctly display the camera preview on the screen.
-     * </p>
-     * <p>
-     * It solves two main problems:
-     *
-     * <ol>
-     *     <li>Orientation Mismatch: The camera sensor has a fixed orientation (usually landscape),
-     *     but the phone can be held in any orientation (portrait, landscape, upside down). This
-     *     method applies the necessary rotation to the camera preview so that it appears upright to
-     *     the user. For instance, if the phone is held in portrait (ROTATION_90), it rotates the
-     *     preview stream by -90 or 270 degrees.</li>
-     *     <li>Aspect Ratio Mismatch: The resolution of the camera preview (mPreviewSize) often has
-     *     a different aspect ratio than the TextureView displaying it on the screen. To prevent the
-     *     image from looking stretched or squashed, this method calculates a transformation matrix.
-     *     Specifically, it scales the preview to completely fill the view, which may involve cropping
-     *     parts of the image that don't fit. This is often called a "center-crop" effect.</li>
-     * </ol>
-     *
-     * @param viewWidth  The width of `mTextureView`
-     * @param viewHeight The height of `mTextureView`
-     */
-    private void configureTransform(int viewWidth, int viewHeight) {
-        if (null == mTextureView || null == mPreviewSize) {
-            return;
-        }
-        if (!mFitPreview) {
-            Timber.w("configureTransform is disabled!");
-            return;
-        }
-
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
-
-        float centerX = viewRect.centerX();
-        float centerY = viewRect.centerY();
-        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-        matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-        float scale = Math.max((float) viewHeight / mPreviewSize.getHeight(), (float) viewWidth / mPreviewSize.getWidth());
-
-        if (Surface.ROTATION_90 == mRotation || Surface.ROTATION_270 == mRotation) {
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate((90 * (mRotation - 2)) % 360, centerX, centerY);
-            Timber.d("configureTransform when 90/270, scale = %f, rotate = %d", scale, (90 * (mRotation - 2)) % 360);
-        } else if (Surface.ROTATION_180 == mRotation) {
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(180, centerX, centerY);
-            Timber.d("configureTransform when 180, scale = %f, rotate = 180", scale);
-        } else if (Surface.ROTATION_0 == mRotation) {
-            matrix.postScale(scale, scale, centerX, centerY);
-            Timber.d("configureTransform when 0, scale = %f, rotate = 0", scale);
-        }
-
-        Timber.d("camera orientation = %d, degree = %d", getCameraOrientation(mRotation, mCameraId), mRotation * 90);
-        mTextureView.setTransform(matrix);
-    }
-
     public static final class Builder {
 
         /**
@@ -756,9 +675,6 @@ public class Camera2Presenter {
             }
             if (sizeSelector == null) {
                 throw new NullPointerException("you must provide a sizeSelector!");
-            }
-            if (previewView == null) {
-                throw new NullPointerException("you must preview on a textureView or a surfaceView!");
             }
             return new Camera2Presenter(this);
         }
