@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity"
+    tools:context=".opengl.jwopengl.usecase.OpenGLRecorderActivity"
     tools:ignore="HardcodedText">
 
     <android.opengl.GLSurfaceView

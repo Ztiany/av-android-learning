@@ -133,13 +133,13 @@
             android:name=".opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity"
             android:label="OpenGLES with Java Common" />
         <activity
-            android:name=".opengl.jwopengl.usecase.camera.OpenGLCameraPreviewActivity"
+            android:name=".opengl.jwopengl.usecase.OpenGLCameraPreviewActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity"
+            android:name=".opengl.jwopengl.usecase.EGLCameraPreviewWithActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity"
+            android:name=".opengl.jwopengl.usecase.OpenGLRecorderActivity"
             android:theme="@style/Theme.FullScreen" />
         <!--Native-->
         <activity

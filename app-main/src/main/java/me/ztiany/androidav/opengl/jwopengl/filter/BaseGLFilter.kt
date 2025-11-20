@@ -1,5 +1,6 @@
 package me.ztiany.androidav.opengl.jwopengl.filter
 
+import androidx.annotation.CallSuper
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
@@ -13,11 +14,11 @@ abstract class BaseGLFilter : GLFilter {
 
     override fun initProgram() {
         if (!this::_glProgram.isInitialized) {
-            _glProgram = createAndInitProgram()
+            _glProgram = onCreateProgram()
         }
     }
 
-    protected abstract fun createAndInitProgram(): GLProgram
+    protected abstract fun onCreateProgram(): GLProgram
 
     override fun setWorldSize(width: Int, height: Int) = Unit
 
@@ -29,5 +30,12 @@ abstract class BaseGLFilter : GLFilter {
     }
 
     protected abstract fun doDraw(sharedTexture: GLTexture): GLTexture
+
+    @CallSuper
+    override fun release() {
+        if (this::_glProgram.isInitialized) {
+            _glProgram.delete()
+        }
+    }
 
 }

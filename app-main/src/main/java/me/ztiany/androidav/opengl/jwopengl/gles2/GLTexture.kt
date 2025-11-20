@@ -188,7 +188,7 @@ fun GLTexture.activeTexture(handle: Int, index: Int) {
     GLES20.glUniform1i(handle, index)
 }
 
-fun GLTexture.deleteTexture() {
+fun GLTexture.delete() {
     GLES20.glBindTexture(type, 0)
     GLES20.glDeleteTextures(1, intArrayOf(id), 0)
 }

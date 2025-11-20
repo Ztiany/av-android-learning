@@ -43,5 +43,5 @@ fun GLFBOWithTexture.delete() {
     GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_NONE)
     GLES20.glDeleteFramebuffers(1, intArrayOf(id), 0)
     // 删除 Texture
-    texture.deleteTexture()
+    texture.delete()
 }

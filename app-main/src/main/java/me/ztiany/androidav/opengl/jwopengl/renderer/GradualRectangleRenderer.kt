@@ -5,10 +5,11 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.generateVBOBuffer
 import me.ztiany.androidav.opengl.jwopengl.gles2.newVertexCoordinateFull3
 import me.ztiany.androidav.opengl.common.GLRenderer
+import timber.log.Timber
 
 class GradualRectangleRenderer : GLRenderer {
 
-    private lateinit var program: GLProgram
+    private var glProgram: GLProgram? = null
 
     /** 四个点的颜色 */
     private val vertexColor = floatArrayOf(
@@ -29,18 +30,28 @@ class GradualRectangleRenderer : GLRenderer {
     private val colorBuffer = generateVBOBuffer(vertexColor)
 
     override fun onContextInitialized() {
-        program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_coloring.glsl")
+        val program = try {
+            GLProgram.fromAssets(
+                "shader/vertex_base.glsl",
+                "shader/fragment_coloring.glsl"
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return
+        }
         program.activeAttribute("aPosition")
         program.activeAttribute("aColor")
         program.setBgColor(0.7F, 0.5F, 0.5F, 1.0F)
+
+        glProgram = program
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame(attachment: Any? ) {
-        program.startDraw {
+    override fun onDrawFrame(attachment: Any?) {
+        glProgram?.startDraw {
             clearColorBuffer()
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aColor", 4, colorBuffer)
@@ -49,6 +60,9 @@ class GradualRectangleRenderer : GLRenderer {
     }
 
     override fun onContextDestroy() {
+        Timber.d("GradualRectangleRenderer onContextDestroy.")
+        glProgram?.delete()
+        glProgram = null
     }
 
 }

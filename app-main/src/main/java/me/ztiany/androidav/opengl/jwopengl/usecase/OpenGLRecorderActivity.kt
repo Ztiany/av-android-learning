@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.usecase.recorder
+package me.ztiany.androidav.opengl.jwopengl.usecase
 
 import android.graphics.Point
 import android.os.Bundle
@@ -149,6 +149,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         cameraOperator?.release()
+        recorderManager.release()
     }
 
 }

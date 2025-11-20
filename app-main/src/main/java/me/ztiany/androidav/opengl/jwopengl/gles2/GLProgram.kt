@@ -118,7 +118,7 @@ class GLProgram private constructor(
 
     fun uniformHandle(attribute: String) = uniformMap[attribute] ?: throw NoSuchElementException()
 
-    fun release() {
+    fun delete() {
         Timber.d("release() called")
         GLES20.glDeleteProgram(programHandle)
     }

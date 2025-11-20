@@ -7,7 +7,7 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.activeTexture
 
 abstract class BaseEffectFilter : BaseEffectFBOFilter() {
 
-    override fun createAndInitProgram(): GLProgram {
+    override fun onCreateProgram(): GLProgram {
         val glProgram = createGLProgram()
 
         //vertex

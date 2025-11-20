@@ -11,7 +11,7 @@ class EffectSoulFilter : BaseEffectFBOFilter() {
     private var mixPercent = 0F
     private var scalePercent = 0F
 
-    override fun createAndInitProgram(): GLProgram {
+    override fun onCreateProgram(): GLProgram {
         val glProgram = GLProgram.fromAssets(
             "shader/vertex_base.glsl",
             "shader/fragment_soul.glsl"

@@ -5,11 +5,14 @@ import me.ztiany.androidav.R
 import me.ztiany.lib.avbase.utils.loadBitmap
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.androidav.opengl.common.GLRenderer
+import timber.log.Timber
 
 class Fixed1TextureRenderer : GLRenderer {
 
-    private lateinit var glProgram: GLProgram
-    private lateinit var glTexture: GLTexture
+    private var glProgram: GLProgram? = null
+
+    private var glTexture: GLTexture? = null
+
     private val glMVPMatrix by lazy { GLMVPMatrix() }
 
     /** 矩形的坐标 */
@@ -23,18 +26,26 @@ class Fixed1TextureRenderer : GLRenderer {
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onContextInitialized() {
-        glProgram = GLProgram.fromAssets(
-            "shader/vertex_mvp.glsl",
-            "shader/fragment_texture.glsl"
-        )
+        val program = try {
+            GLProgram.fromAssets(
+                "shader/vertex_mvp.glsl",
+                "shader/fragment_texture.glsl"
+            )
+        } catch (e: Exception) {
+            Timber.e(e)
+            return
+        }
+        glProgram = program
 
-        glProgram.activeAttribute("aPosition")
-        glProgram.activeAttribute("aTextureCoordinate")
-        glProgram.activeUniform("uTexture")
-        glProgram.activeUniform("uMVPModelMatrix")
+        with(program) {
+            activeAttribute("aPosition")
+            activeAttribute("aTextureCoordinate")
+            activeUniform("uTexture")
+            activeUniform("uMVPModelMatrix")
+        }
 
         glTexture = GLTexture.generateFromBitmap(
-            glProgram.uniformHandle("uTexture"),
+            program.uniformHandle("uTexture"),
             0,
             loadBitmap(R.drawable.beautiful_gril1)
         )
@@ -42,18 +53,21 @@ class Fixed1TextureRenderer : GLRenderer {
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
-
         glMVPMatrix.setWorldSize(width, height)
-        glMVPMatrix.setModelSize(glTexture.width, glTexture.height)
-        glMVPMatrix.lookAtNormally()
-        glMVPMatrix.adjustToOrthogonal()
-        glMVPMatrix.combineMVP()
+        glTexture?.let {
+            with(glMVPMatrix) {
+                setModelSize(it.width, it.height)
+                lookAtNormally()
+                adjustToOrthogonal()
+                combineMVP()
+            }
+        }
     }
 
-    override fun onDrawFrame(attachment: Any? ) {
-        glProgram.startDraw {
+    override fun onDrawFrame(attachment: Any?) {
+        glProgram?.startDraw {
             clearColorBuffer()
-            glTexture.activeTexture()
+            glTexture?.activeTexture()
             uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
@@ -62,6 +76,12 @@ class Fixed1TextureRenderer : GLRenderer {
     }
 
     override fun onContextDestroy() {
+        Timber.d("Fixed1TextureRenderer onContextDestroy")
+        glProgram?.delete()
+        glProgram = null
+
+        glTexture?.delete()
+        glTexture = null
     }
 
 }

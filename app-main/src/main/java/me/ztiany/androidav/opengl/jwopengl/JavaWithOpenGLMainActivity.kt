@@ -8,9 +8,9 @@ import me.ztiany.androidav.opengl.common.GLParams
 import me.ztiany.androidav.opengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.renderer.*
 import me.ztiany.androidav.opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity
-import me.ztiany.androidav.opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity
-import me.ztiany.androidav.opengl.jwopengl.usecase.camera.OpenGLCameraPreviewActivity
-import me.ztiany.androidav.opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity
+import me.ztiany.androidav.opengl.jwopengl.usecase.EGLCameraPreviewWithActivity
+import me.ztiany.androidav.opengl.jwopengl.usecase.OpenGLCameraPreviewActivity
+import me.ztiany.androidav.opengl.jwopengl.usecase.OpenGLRecorderActivity
 import me.ztiany.lib.avbase.utils.ui.IEntrance
 import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 

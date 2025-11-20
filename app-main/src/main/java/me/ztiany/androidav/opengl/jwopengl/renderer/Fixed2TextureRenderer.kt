@@ -5,11 +5,13 @@ import me.ztiany.androidav.R
 import me.ztiany.lib.avbase.utils.loadBitmap
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.androidav.opengl.common.GLRenderer
+import timber.log.Timber
 
 class Fixed2TextureRenderer : GLRenderer {
 
-    private lateinit var program: GLProgram
-    private lateinit var glTexture: GLTexture
+    private var glProgram: GLProgram? = null
+
+    private var glTexture: GLTexture? = null
 
     private val mvpMatrix by lazy { GLMVPMatrix() }
 
@@ -20,17 +22,24 @@ class Fixed2TextureRenderer : GLRenderer {
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onContextInitialized() {
-        program = GLProgram.fromAssets(
-            "shader/vertex_mvp_separated.glsl",
-            "shader/fragment_texture.glsl"
-        )
+        val program = try {
+            GLProgram.fromAssets(
+                "shader/vertex_mvp_separated.glsl",
+                "shader/fragment_texture.glsl"
+            )
+        } catch (e: Exception) {
+            return
+        }
+        glProgram = program
 
-        program.activeAttribute("aPosition")
-        program.activeAttribute("aTextureCoordinate")
-        program.activeUniform("uTexture")
-        program.activeUniform("uModelMatrix")
-        program.activeUniform("uViewMatrix")
-        program.activeUniform("uProjectionMatrix")
+        with(program) {
+            activeAttribute("aPosition")
+            activeAttribute("aTextureCoordinate")
+            activeUniform("uTexture")
+            activeUniform("uModelMatrix")
+            activeUniform("uViewMatrix")
+            activeUniform("uProjectionMatrix")
+        }
 
         glTexture = GLTexture.generateFromBitmap(
             program.uniformHandle("uTexture"),
@@ -41,17 +50,21 @@ class Fixed2TextureRenderer : GLRenderer {
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
-
         mvpMatrix.setWorldSize(width, height)
-        mvpMatrix.setModelSize(glTexture.width, glTexture.height)
-        mvpMatrix.lookAtNormally()
-        mvpMatrix.adjustToOrthogonal()
+
+        glTexture?.let {
+            with(mvpMatrix) {
+                setModelSize(it.width, it.height)
+                lookAtNormally()
+                adjustToOrthogonal()
+            }
+        }
     }
 
-    override fun onDrawFrame(attachment: Any? ) {
-        program.startDraw {
+    override fun onDrawFrame(attachment: Any?) {
+        glProgram?.startDraw {
             clearColorBuffer()
-            glTexture.activeTexture()
+            glTexture?.activeTexture()
             uniformMatrix4fv("uModelMatrix", mvpMatrix.modelMatrix)
             uniformMatrix4fv("uViewMatrix", mvpMatrix.viewMatrix)
             uniformMatrix4fv("uProjectionMatrix", mvpMatrix.projectionMatrix)
@@ -62,6 +75,13 @@ class Fixed2TextureRenderer : GLRenderer {
     }
 
     override fun onContextDestroy() {
+        Timber.d("Fixed2TextureRenderer onContextDestroy")
+
+        glProgram?.delete()
+        glProgram = null
+
+        glTexture?.delete()
+        glTexture = null
     }
 
 }

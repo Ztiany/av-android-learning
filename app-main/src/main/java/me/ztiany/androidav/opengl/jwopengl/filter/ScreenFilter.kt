@@ -21,7 +21,7 @@ class ScreenFilter : BaseGLFilter() {
     /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
-    override fun createAndInitProgram(): GLProgram {
+    override fun onCreateProgram(): GLProgram {
         Timber.d("createAndInitProgram() called")
 
         val glProgram = GLProgram.fromAssets(

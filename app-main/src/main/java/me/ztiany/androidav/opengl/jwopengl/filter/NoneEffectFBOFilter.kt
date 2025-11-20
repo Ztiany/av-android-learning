@@ -18,7 +18,7 @@ class NoneEffectFBOFilter : BaseGLFilter() {
     /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
-    override fun createAndInitProgram(): GLProgram {
+    override fun onCreateProgram(): GLProgram {
         Timber.d("createAndInitProgram() called")
 
         val glProgram = GLProgram.fromAssets(
@@ -108,6 +108,12 @@ class NoneEffectFBOFilter : BaseGLFilter() {
         }
 
         return fbo
+    }
+
+    override fun release() {
+        super.release()
+        glFBO?.delete()
+        glFBO = null
     }
 
 }

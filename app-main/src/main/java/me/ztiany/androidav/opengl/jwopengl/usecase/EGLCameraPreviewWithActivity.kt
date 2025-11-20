@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.usecase.camera
+package me.ztiany.androidav.opengl.jwopengl.usecase
 
 import android.graphics.Point
 import android.graphics.SurfaceTexture

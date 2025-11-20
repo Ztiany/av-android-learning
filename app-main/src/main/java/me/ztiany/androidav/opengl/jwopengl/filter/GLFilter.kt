@@ -13,4 +13,6 @@ interface GLFilter {
 
     fun onDrawFrame(sharedTexture: GLTexture): GLTexture
 
+    fun release()
+
 }

@@ -28,9 +28,7 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
     final override fun doDraw(sharedTexture: GLTexture): GLTexture {
         val fbo = getFBO()
-        fbo.use {
-            drawOnFBO(sharedTexture)
-        }
+        fbo.use { drawOnFBO(sharedTexture) }
         return fbo.texture
     }
 
@@ -58,6 +56,12 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
         }
 
         return fbo
+    }
+
+    override fun release() {
+        super.release()
+        glFBO?.delete()
+        glFBO = null
     }
 
 }

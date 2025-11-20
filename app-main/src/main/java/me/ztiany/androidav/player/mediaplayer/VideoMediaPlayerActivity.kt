@@ -1,5 +1,6 @@
 package me.ztiany.androidav.player.mediaplayer
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.opengl.GLSurfaceView
 import android.os.Bundle
@@ -11,6 +12,7 @@ import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
 import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
 import me.ztiany.androidav.opengl.common.setGLRenderer
 import me.ztiany.lib.avbase.app.activity.BaseActivity
 import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
@@ -38,11 +40,13 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
         })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showSelectedFile() {
         binding.videoSelectedFile.text = "已经选择：${selectedFile.toString()}"
         selectedFile?.let {
             lifecycleScope.launch {
-                Timber.d(loadMediaMetadataSuspend(this@VideoMediaPlayerActivity, it).toString())
+                val metadata = loadMediaMetadataSuspend(this@VideoMediaPlayerActivity, it)
+                Timber.d(metadata.toString())
             }
         }
     }
@@ -102,11 +106,18 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
             renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
         }
 
-        mediaPlayerRenderer.getSurfaceTexture {
-            videoPlayer.setSurface(Surface(it))
-        }
+        mediaPlayerRenderer.listenToSurfaceTexture(object : SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(surfaceTexture: android.graphics.SurfaceTexture) {
+                videoPlayer.setSurface(Surface(surfaceTexture))
+            }
+
+            override fun onSurfaceTextureToDestroy(surfaceTexture: android.graphics.SurfaceTexture) {
+                videoPlayer.setSurface(null)
+            }
+        })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setUpButtons() {
         binding.videoSelect.setOnClickListener {
             systemMediaSelector.takeFileFromSystem().mimeType("video/*").start()
@@ -141,6 +152,7 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private fun formatVideoTime(time: Long): String {
         if (time > 0) {
             val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
@@ -159,6 +171,7 @@ class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>(
 
     override fun onDestroy() {
         super.onDestroy()
+        glRenderer.onContextDestroy()
         videoPlayer.stop()
         videoPlayer.release()
     }

@@ -5,6 +5,7 @@ import android.opengl.EGLContext
 import android.opengl.GLSurfaceView
 import android.util.Size
 import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
 import me.ztiany.androidav.opengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
@@ -19,7 +20,7 @@ class RecorderManager {
     // Base
     ///////////////////////////////////////////////////////////////////////////
 
-    private lateinit var showRenderer: RecorderShowRenderer
+    private lateinit var showRenderer: ComposableCameraRenderer
 
     private lateinit var encodeRenderer: RecorderEncodeRenderer
 
@@ -38,7 +39,7 @@ class RecorderManager {
         encodeRenderer = RecorderEncodeRenderer()
 
         // init the renderer
-        showRenderer = RecorderShowRenderer(glSurfaceView.context, object : EGLBridge {
+        showRenderer = ComposableCameraRenderer(glSurfaceView.context, object : EGLBridge {
             override fun requestRender() {
                 glSurfaceView.requestRender()
             }
@@ -83,8 +84,17 @@ class RecorderManager {
 
         showRenderer.setVideoAttribute(textureAttribute)
         encodeRenderer.setVideoAttribute(textureAttribute)
-        //start preview.
-        showRenderer.getSurfaceTexture { startPreview(it) }
+
+        // start preview.
+        showRenderer.listenToSurfaceTexture(object : SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture) {
+                startPreview(surfaceTexture)
+            }
+
+            override fun onSurfaceTextureToDestroy(surfaceTexture: SurfaceTexture) {
+                // no-op
+            }
+        })
     }
 
     fun startRecording(path: String) {
@@ -147,6 +157,15 @@ class RecorderManager {
     fun removeAllEffect() {
         checkIfInitialized()
         showRenderer.removeAllEffect()
+    }
+
+    fun release() {
+        if (!hasInitialized.get()) {
+            return
+        }
+        showRenderer.onContextDestroy()
+        encodeRenderer.stop()
+        encodeRenderer.onContextDestroy()
     }
 
 }

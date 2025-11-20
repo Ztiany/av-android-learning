@@ -17,7 +17,7 @@ import timber.log.Timber
 class RecorderEncodeRenderer : GLRenderer {
 
     /** CPU 着色器程序 */
-    private lateinit var glProgram: GLProgram
+    private var glProgram: GLProgram? = null
 
     /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
@@ -36,10 +36,6 @@ class RecorderEncodeRenderer : GLRenderer {
     private var textureWidth = 0
 
     private var textureHeight = 0
-
-    override fun onContextDestroy() {
-        Timber.d("onSurfaceDestroy")
-    }
 
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
@@ -85,11 +81,12 @@ class RecorderEncodeRenderer : GLRenderer {
 
     fun stop() {
         mediaCodecSurfaceProvider?.stop()
-        eglEnvironment?.release()
-        encoder?.stop()
-
-        eglEnvironment = null
         mediaCodecSurfaceProvider = null
+
+        eglEnvironment?.release()
+        eglEnvironment = null
+
+        encoder?.stop()
         encoder = null
     }
 
@@ -106,17 +103,22 @@ class RecorderEncodeRenderer : GLRenderer {
 
     override fun onContextInitialized() {
         Timber.d("onSurfaceCreated() called")
-        glProgram = GLProgram.fromAssets(
-            "shader/vertex_base.glsl",
-            "shader/fragment_texture.glsl"
-        )
+        val program = try {
+            GLProgram.fromAssets(
+                "shader/vertex_base.glsl",
+                "shader/fragment_texture.glsl"
+            )
+        } catch (e: Exception) {
+            return
+        }
 
-        //vertex
-        glProgram.activeAttribute("aPosition")
-        glProgram.activeAttribute("aTextureCoordinate")
+        with(program) {
+            activeAttribute("aPosition")
+            activeAttribute("aTextureCoordinate")
+            activeUniform("uTexture")
+        }
 
-        //fragment
-        glProgram.activeUniform("uTexture")
+        glProgram = program
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
@@ -126,7 +128,7 @@ class RecorderEncodeRenderer : GLRenderer {
 
     override fun onDrawFrame(attachment: Any?) {
         val textureWithTime = attachment as? TextureWithTime ?: return
-        glProgram.startDraw {
+        glProgram?.startDraw {
             // vertex
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
@@ -155,6 +157,12 @@ class RecorderEncodeRenderer : GLRenderer {
         override fun stop() {
             surfaceProviderCallback.onSurfaceDestroyed()
         }
+    }
+
+    override fun onContextDestroy() {
+        Timber.d("onSurfaceDestroy")
+        glProgram?.delete()
+        glProgram = null
     }
 
 }

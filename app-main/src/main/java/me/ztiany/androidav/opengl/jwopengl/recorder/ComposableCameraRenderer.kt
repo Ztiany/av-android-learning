@@ -8,26 +8,26 @@ import android.opengl.GLES11Ext
 import androidx.core.content.ContextCompat
 import me.ztiany.androidav.opengl.common.EGLBridge
 import me.ztiany.androidav.opengl.common.GLRenderer
-import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
-import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
 import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
 import me.ztiany.androidav.opengl.jwopengl.filter.NoneEffectFBOFilter
 import me.ztiany.androidav.opengl.jwopengl.filter.ScreenFilter
+import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
+import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
+import me.ztiany.androidav.opengl.jwopengl.gles2.delete
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** 录像特效 + 展示 */
-class RecorderShowRenderer(
+class ComposableCameraRenderer(
     private val context: Context,
     private val eglBridge: EGLBridge
 ) : GLRenderer {
 
     /** 承载视频的纹理 */
-    private lateinit var cameraSurfaceTexture: SurfaceTexture
+    private var surfaceTexture: SurfaceTexture? = null
 
-    private lateinit var cameraTexture: GLTexture
-
-    private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
+    private var glTexture: GLTexture? = null
 
     private val foundationFBOFilter = NoneEffectFBOFilter()
 
@@ -43,6 +43,23 @@ class RecorderShowRenderer(
 
     private var attribute: TextureAttribute? = null
 
+    private var currentWorldWidth = 0
+
+    private var currentWorldHeight = 0
+
+    private var surfaceTextureListener: SurfaceTextureListener? = null
+
+    fun listenToSurfaceTexture(surfaceTextureListener: SurfaceTextureListener?) {
+        this.surfaceTextureListener = surfaceTextureListener
+        dispatchSurfaceTexture()
+    }
+
+    private fun dispatchSurfaceTexture() {
+        surfaceTexture?.let { st ->
+            surfaceTextureListener?.onSurfaceTextureAvailable(st)
+        }
+    }
+
     fun startRecording(recorder: Recorder) {
         this.recorder?.onStop()
         this.recorder = recorder
@@ -55,35 +72,21 @@ class RecorderShowRenderer(
         stoppingRecorder?.onStop()
     }
 
-    fun getSurfaceTexture(onSurfaceText: (SurfaceTexture) -> Unit) {
-        if (::cameraSurfaceTexture.isInitialized) {
-            onSurfaceText(cameraSurfaceTexture)
-        } else {
-            this.onSurfaceText = onSurfaceText
-        }
-    }
-
     override fun onContextInitialized() {
         Timber.d("onSurfaceCreated() called")
 
         eglContext = EGL14.eglGetCurrentContext()
 
-        cameraTexture = GLTexture.generate(
+        val texture = GLTexture.generate(
             GLTexture.NONE,
             0,
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
         )
+        glTexture = texture
 
-        cameraSurfaceTexture = SurfaceTexture(cameraTexture.id)
-
-        ContextCompat.getMainExecutor(context).execute {
-            onSurfaceText?.invoke(cameraSurfaceTexture)
-            onSurfaceText = null
-        }
-
-        cameraSurfaceTexture.setOnFrameAvailableListener {
-            onFrameAvailable(it)
-        }
+        surfaceTexture = SurfaceTexture(texture.id)
+        ContextCompat.getMainExecutor(context).execute { dispatchSurfaceTexture() }
+        surfaceTexture?.setOnFrameAvailableListener { eglBridge.requestRender() }
 
         foundationFBOFilter.initProgram()
         foundationScreenFilter.initProgram()
@@ -91,24 +94,26 @@ class RecorderShowRenderer(
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
+        currentWorldWidth = width
+        currentWorldHeight = height
 
         foundationFBOFilter.setWorldSize(width, height)
         foundationScreenFilter.setWorldSize(width, height)
 
-        effectFilters.forEach {
-            it.setWorldSize(width, height)
-        }
+        effectFilters.forEach { it.setWorldSize(width, height) }
     }
 
     override fun onDrawFrame(attachment: Any?) {
         if (!textureSizeReceived) {
             return
         }
+        val lSurfaceTexture = surfaceTexture ?: return
+        val texture = glTexture ?: return
 
-        cameraSurfaceTexture.updateTexImage()
+        surfaceTexture?.updateTexImage()
 
         // draw raw video on fbo
-        var glTexture = foundationFBOFilter.onDrawFrame(cameraTexture)
+        var glTexture = foundationFBOFilter.onDrawFrame(texture)
 
         // do effect on fbo
         effectFilters.forEach {
@@ -120,17 +125,28 @@ class RecorderShowRenderer(
 
         // send effect to recorder if need.
         recorder?.run {
-            onFrame(TextureWithTime(glTexture, cameraSurfaceTexture.timestamp))
+            onFrame(TextureWithTime(glTexture, lSurfaceTexture.timestamp))
         }
     }
 
     override fun onContextDestroy() {
-        Timber.d("onSurfaceDestroy")
+        Timber.d("onSurfaceDestroyed() called")
+
+        foundationFBOFilter.release()
+        foundationScreenFilter.release()
+        for (filter in effectFilters) {
+            filter.release()
+        }
+
+        surfaceTexture?.setOnFrameAvailableListener(null)
+        surfaceTexture?.let { surfaceTextureListener?.onSurfaceTextureToDestroy(it) }
+        surfaceTexture?.release()
+        surfaceTexture = null
+
+        glTexture?.delete()
+        glTexture = null
     }
 
-    private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        eglBridge.requestRender()
-    }
 
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")

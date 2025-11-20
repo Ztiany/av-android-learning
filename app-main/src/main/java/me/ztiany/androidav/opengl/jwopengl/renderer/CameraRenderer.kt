@@ -104,14 +104,15 @@ class CameraRenderer(
 
     override fun onContextDestroy() {
         Timber.d("onSurfaceDestroy")
-        glProgram?.release()
+        glProgram?.delete()
         glProgram = null
 
         surfaceTexture?.setOnFrameAvailableListener(null)
         surfaceTexture?.let { surfaceTextureListener?.onSurfaceTextureToDestroy(it) }
+        surfaceTexture?.release()
         surfaceTexture = null
 
-        glTexture?.deleteTexture()
+        glTexture?.delete()
         glTexture = null
     }
 
