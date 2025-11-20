@@ -4,17 +4,15 @@ import androidx.annotation.CallSuper
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
+import timber.log.Timber
 
 abstract class BaseGLFilter : GLFilter {
 
-    private lateinit var _glProgram: GLProgram
+    private var glProgram: GLProgram? = null
 
-    protected val glProgram: GLProgram
-        get() = _glProgram
-
-    override fun initProgram() {
-        if (!this::_glProgram.isInitialized) {
-            _glProgram = onCreateProgram()
+    final override fun initProgram() {
+        if (glProgram == null) {
+            glProgram = onCreateProgram()
         }
     }
 
@@ -25,17 +23,21 @@ abstract class BaseGLFilter : GLFilter {
     override fun setTextureAttribute(attribute: TextureAttribute) = Unit
 
     override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
-        initProgram()
-        return doDraw(sharedTexture)
+        try {
+            initProgram()
+        } catch (e: Exception) {
+            Timber.e("initProgram error: ${e.message}")
+        }
+
+        return glProgram?.doDraw(sharedTexture) ?: sharedTexture
     }
 
-    protected abstract fun doDraw(sharedTexture: GLTexture): GLTexture
+    protected abstract fun GLProgram.doDraw(sharedTexture: GLTexture): GLTexture
 
     @CallSuper
     override fun release() {
-        if (this::_glProgram.isInitialized) {
-            _glProgram.delete()
-        }
+        glProgram?.delete()
+        glProgram = null
     }
 
 }

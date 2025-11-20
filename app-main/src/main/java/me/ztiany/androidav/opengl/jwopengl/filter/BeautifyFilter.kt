@@ -14,11 +14,9 @@ class BeautifyFilter(private val version: Int) : BaseEffectFilter() {
         }
     }
 
-    override fun beforeDraw() {
-        with(glProgram) {
-            uniform1i("width", textureWidth)
-            uniform1i("height", textureHeight)
-        }
+    override fun GLProgram.beforeDraw() {
+        uniform1i("width", textureWidth)
+        uniform1i("height", textureHeight)
     }
 
 }

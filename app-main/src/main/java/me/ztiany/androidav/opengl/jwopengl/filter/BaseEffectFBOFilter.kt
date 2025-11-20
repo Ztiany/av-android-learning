@@ -26,15 +26,15 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
         this.textureHeight = attribute.height
     }
 
-    final override fun doDraw(sharedTexture: GLTexture): GLTexture {
-        val fbo = getFBO()
-        fbo.use { drawOnFBO(sharedTexture) }
-        return fbo.texture
+    final override fun GLProgram.doDraw(sharedTexture: GLTexture): GLTexture {
+        return getFBO(this).use {
+            drawOnFBO(sharedTexture)
+        }.texture
     }
 
-    abstract fun drawOnFBO(sharedTexture: GLTexture)
+    abstract fun GLProgram.drawOnFBO(sharedTexture: GLTexture)
 
-    private fun getFBO(): GLFBOWithTexture {
+    private fun getFBO(glProgram: GLProgram): GLFBOWithTexture {
         var fbo = glFBO
 
         if (fbo != null && (fbo.texture.width != textureWidth || fbo.texture.height != textureHeight)) {
@@ -44,6 +44,7 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
         if (fbo == null) {
             Timber.d("create new fbo $textureWidth x $textureHeight.")
+
             val glTexture = GLTexture.generateFBOTexture(
                 glProgram.uniformHandle("uTexture"),
                 0,

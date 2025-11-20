@@ -24,21 +24,19 @@ abstract class BaseEffectFilter : BaseEffectFBOFilter() {
 
     override fun setWorldSize(width: Int, height: Int) = Unit
 
-    override fun drawOnFBO(sharedTexture: GLTexture) {
-        glProgram.startDraw {
-            clearColorBuffer()
-            GLES20.glViewport(0, 0, textureWidth, textureHeight)
-            beforeDraw()
-            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
-            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            //texture【将分享过来的纹理绘制到 FBO 的纹理上】
-            sharedTexture.activeTexture(uniformHandle("uTexture"))
-            //draw
-            drawArraysStrip(4/*4 个顶点*/)
-        }
+    override fun GLProgram.drawOnFBO(sharedTexture: GLTexture) = startDraw {
+        clearColorBuffer()
+        GLES20.glViewport(0, 0, textureWidth, textureHeight)
+        beforeDraw()
+        vertexAttribPointerFloat("aPosition", 3, vertexVbo)
+        vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
+        //texture【将分享过来的纹理绘制到 FBO 的纹理上】
+        sharedTexture.activeTexture(uniformHandle("uTexture"))
+        //draw
+        drawArraysStrip(4/*4 个顶点*/)
     }
 
-    protected open fun beforeDraw() {
+    protected open fun GLProgram.beforeDraw() {
 
     }
 

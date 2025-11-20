@@ -67,26 +67,22 @@ class NoneEffectFBOFilter : BaseGLFilter() {
         }
     }
 
-    override fun doDraw(sharedTexture: GLTexture): GLTexture {
-        val fbo = getFBO()
-        fbo.use {
-            glProgram.startDraw {
-                clearColorBuffer()
-                GLES20.glViewport(0, 0, glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
-                //vertex
-                vertexAttribPointerFloat("aPosition", 3, vertexVbo)
-                vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-                uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
-                //texture【将分享过来的视频纹理绘制到自己的 FBO 对应的纹理上】
-                sharedTexture.activeTexture(uniformHandle("uTexture"))
-                //draw
-                drawArraysStrip(4/*4 个顶点*/)
-            }
+    override fun GLProgram.doDraw(sharedTexture: GLTexture) = getFBO(this).use {
+        startDraw {
+            clearColorBuffer()
+            GLES20.glViewport(0, 0, glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
+            //vertex
+            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
+            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
+            uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
+            //texture【将分享过来的视频纹理绘制到自己的 FBO 对应的纹理上】
+            sharedTexture.activeTexture(uniformHandle("uTexture"))
+            //draw
+            drawArraysStrip(4/*4 个顶点*/)
         }
-        return fbo.texture
-    }
+    }.texture
 
-    private fun getFBO(): GLFBOWithTexture {
+    private fun getFBO(glProgram: GLProgram): GLFBOWithTexture {
         var fbo = glFBO
 
         if (fbo != null && (fbo.texture.width != glMVPMatrix.getModelWidth() || fbo.texture.height != glMVPMatrix.getModelHeight())) {

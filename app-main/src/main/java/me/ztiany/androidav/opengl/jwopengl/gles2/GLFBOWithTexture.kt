@@ -31,11 +31,12 @@ fun GLFBOWithTexture.bindFBO() {
     )
 }
 
-fun GLFBOWithTexture.use(onDraw: GLFBOWithTexture.() -> Unit) {
+fun GLFBOWithTexture.use(onDraw: GLFBOWithTexture.() -> Unit): GLFBOWithTexture {
     bindFBO()
     onDraw(this)
     // unbindFBO
     GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_NONE)
+    return this
 }
 
 fun GLFBOWithTexture.delete() {

@@ -63,9 +63,9 @@ class ScreenFilter : BaseGLFilter() {
         glMVPMatrix.combineMVP()
     }
 
-    override fun doDraw(sharedTexture: GLTexture): GLTexture {
+    override fun GLProgram.doDraw(sharedTexture: GLTexture): GLTexture {
         GLES20.glViewport(0, 0, glMVPMatrix.getWorldWidth(), glMVPMatrix.getWorldHeight())
-        glProgram.startDraw {
+        startDraw {
             //clear
             clearColorBuffer()
             //vertex

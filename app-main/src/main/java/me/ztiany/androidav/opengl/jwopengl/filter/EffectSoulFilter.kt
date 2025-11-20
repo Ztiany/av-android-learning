@@ -29,24 +29,21 @@ class EffectSoulFilter : BaseEffectFBOFilter() {
         return glProgram
     }
 
-    override fun drawOnFBO(sharedTexture: GLTexture) {
-        glProgram.startDraw {
-            clearColorBuffer()
-            GLES20.glViewport(0, 0, textureWidth, textureHeight)
-            //vertex
-            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
-            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            //fragment
-            uniform1f("scalePercent", 1.0F + scalePercent)//[1, 2]
-            uniform1f("mixPercent", 1.0F - mixPercent)//[1,0]
-            updatePercent()
-            //texture【将分享过来的纹理绘制到 FBO 的纹理上】
-            sharedTexture.activeTexture(uniformHandle("uTexture"))
-            //draw
-            drawArraysStrip(4/*4 个顶点*/)
-        }
+    override fun GLProgram.drawOnFBO(sharedTexture: GLTexture) = startDraw {
+        clearColorBuffer()
+        GLES20.glViewport(0, 0, textureWidth, textureHeight)
+        //vertex
+        vertexAttribPointerFloat("aPosition", 3, vertexVbo)
+        vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
+        //fragment
+        uniform1f("scalePercent", 1.0F + scalePercent)//[1, 2]
+        uniform1f("mixPercent", 1.0F - mixPercent)//[1,0]
+        updatePercent()
+        //texture【将分享过来的纹理绘制到 FBO 的纹理上】
+        sharedTexture.activeTexture(uniformHandle("uTexture"))
+        //draw
+        drawArraysStrip(4/*4 个顶点*/)
     }
-
 
     private fun updatePercent() {
         scalePercent += 0.08F
