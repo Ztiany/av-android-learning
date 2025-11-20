@@ -82,7 +82,8 @@ class EGLCore {
                 0
             )
         } catch (throwable: Throwable) {
-            Timber.e(throwable)
+            Timber.e(throwable, "eglCreateContext failed")
+            throw throwable
         }
 
         if (eglContext == EGL14.EGL_NO_CONTEXT) {

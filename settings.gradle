@@ -1,4 +1,4 @@
-rootProject.name = "Android-AV"
+rootProject.name = "av-android-learning"
 include ':lib-avbase'
 include ':app-main'
 include ':app-rtmp'

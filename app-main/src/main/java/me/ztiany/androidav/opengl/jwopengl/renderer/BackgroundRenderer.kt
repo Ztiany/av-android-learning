@@ -1,12 +1,12 @@
 package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.GLRenderer
 import timber.log.Timber
 
 class BackgroundRenderer : GLRenderer {
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         Timber.d("onSurfaceCreated() called")
         //设置当前颜色状态【OpenGL 是一个状态机】
         GLES20.glClearColor(0.6F, 0.4F, 0.1F, 1.0F)
@@ -23,7 +23,7 @@ class BackgroundRenderer : GLRenderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
     }
 
 }

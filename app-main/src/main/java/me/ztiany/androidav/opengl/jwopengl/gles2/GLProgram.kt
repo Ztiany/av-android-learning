@@ -2,9 +2,10 @@ package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
 import me.ztiany.lib.avbase.utils.FileUtils
+import timber.log.Timber
 import java.nio.FloatBuffer
 
-class GLProgram(
+class GLProgram private constructor(
     vertexSource: String,
     fragmentSource: String
 ) {
@@ -16,6 +17,8 @@ class GLProgram(
     private val uniformMap = mutableMapOf<String, Int>()
 
     companion object {
+
+        @Throws(IllegalArgumentException::class)
         fun fromAssets(vertexPath: String, fragmentPath: String) = GLProgram(
             FileUtils.loadAssets(vertexPath),
             FileUtils.loadAssets(fragmentPath)
@@ -109,8 +112,15 @@ class GLProgram(
         GLES20.glUniform1i(uniformHandle(uniformName), value)
     }
 
-    fun attributeHandle(attribute: String) = attributeMap[attribute] ?: throw NoSuchElementException()
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun attributeHandle(attribute: String) =
+        attributeMap[attribute] ?: throw NoSuchElementException()
 
     fun uniformHandle(attribute: String) = uniformMap[attribute] ?: throw NoSuchElementException()
+
+    fun release() {
+        Timber.d("release() called")
+        GLES20.glDeleteProgram(programHandle)
+    }
 
 }

@@ -3,10 +3,10 @@ package me.ztiany.androidav.opengl.jwopengl.recorder
 import android.opengl.EGLContext
 import android.opengl.GLES20
 import android.view.Surface
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
-import me.ztiany.androidav.opengl.jwopengl.common.RenderMode
-import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProvider
-import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProviderCallback
+import me.ztiany.androidav.opengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.RenderMode
+import me.ztiany.androidav.opengl.common.SurfaceProvider
+import me.ztiany.androidav.opengl.common.SurfaceProviderCallback
 import me.ztiany.androidav.opengl.jwopengl.egl14.*
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
@@ -37,7 +37,7 @@ class RecorderEncodeRenderer : GLRenderer {
 
     private var textureHeight = 0
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
         Timber.d("onSurfaceDestroy")
     }
 
@@ -76,7 +76,8 @@ class RecorderEncodeRenderer : GLRenderer {
             EGLAttribute(sharedEGLContext)
         ).apply {
             renderMode = RenderMode.WhenDirty
-            start(this@RecorderEncodeRenderer)
+            bindRenderers(this@RecorderEncodeRenderer)
+            start()
         }
 
         this.mediaCodecSurfaceProvider = surfaceProvider
@@ -103,7 +104,7 @@ class RecorderEncodeRenderer : GLRenderer {
         eglEnvironment?.requestRender(frame)
     }
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         Timber.d("onSurfaceCreated() called")
         glProgram = GLProgram.fromAssets(
             "shader/vertex_base.glsl",

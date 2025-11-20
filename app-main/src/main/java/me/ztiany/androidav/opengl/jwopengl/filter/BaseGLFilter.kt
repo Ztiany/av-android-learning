@@ -19,11 +19,9 @@ abstract class BaseGLFilter : GLFilter {
 
     protected abstract fun createAndInitProgram(): GLProgram
 
-    override fun setWorldSize(width: Int, height: Int) {
-    }
+    override fun setWorldSize(width: Int, height: Int) = Unit
 
-    override fun setTextureAttribute(attribute: TextureAttribute) {
-    }
+    override fun setTextureAttribute(attribute: TextureAttribute) = Unit
 
     override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
         initProgram()

@@ -22,9 +22,7 @@ abstract class BaseEffectFilter : BaseEffectFBOFilter() {
 
     protected abstract fun createGLProgram(): GLProgram
 
-    override fun setWorldSize(width: Int, height: Int) {
-
-    }
+    override fun setWorldSize(width: Int, height: Int) = Unit
 
     override fun drawOnFBO(sharedTexture: GLTexture) {
         glProgram.startDraw {

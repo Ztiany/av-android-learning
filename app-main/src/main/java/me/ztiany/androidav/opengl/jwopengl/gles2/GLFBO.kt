@@ -6,10 +6,13 @@ class GLFBO(val name: Int) {
     override fun toString(): String {
         return "GLFBO(name=$name)"
     }
-}
 
-fun generateFBO(): GLFBO {
-    val frameBufferIds = intArrayOf(1)
-    GLES20.glGenFramebuffers(1, frameBufferIds, 0)
-    return GLFBO(frameBufferIds[0])
+    companion object {
+        fun generate(): GLFBO {
+            val frameBufferIds = intArrayOf(1)
+            GLES20.glGenFramebuffers(1, frameBufferIds, 0)
+            return GLFBO(frameBufferIds[0])
+        }
+    }
+
 }

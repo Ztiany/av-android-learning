@@ -38,7 +38,8 @@ class NoneEffectFBOFilter : BaseGLFilter() {
     }
 
     override fun setWorldSize(width: Int, height: Int) {
-
+        Timber.d("setWorldSize() called with: width = $width, height = $height")
+        // We need keep the first texture's original appearance, so we do not set model size here.
     }
 
     override fun setTextureAttribute(attribute: TextureAttribute) {
@@ -95,14 +96,14 @@ class NoneEffectFBOFilter : BaseGLFilter() {
 
         if (fbo == null) {
             Timber.d("create new fbo ${glMVPMatrix.getModelWidth()} x ${glMVPMatrix.getModelHeight()}.")
-            val glTexture = generateFBOTexture(
+            val glTexture = GLTexture.generateFBOTexture(
                 glProgram.uniformHandle("uTexture"),
                 0,
                 //use the real texture size.
                 glMVPMatrix.getModelWidth(),
                 glMVPMatrix.getModelHeight()
             )
-            fbo = generateFBOWithTexture(glTexture)
+            fbo = GLFBOWithTexture.generate(glTexture)
             glFBO = fbo
         }
 

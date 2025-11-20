@@ -1,13 +1,15 @@
 package me.ztiany.androidav.opengl.jwopengl.usecase.camera
 
 import android.graphics.Point
+import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Size
 import androidx.core.view.doOnLayout
 import me.ztiany.androidav.databinding.OpenglActivityCameraPreviewBinding
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
+import me.ztiany.androidav.opengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.renderer.CameraRenderer
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
@@ -36,9 +38,15 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
                 isMirror
             )
         }
-        cameraRenderer?.getSurfaceTexture {
-            cameraOperator?.startPreview(it)
-        }
+
+        cameraRenderer?.listenToSurfaceTexture(object : SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture) {
+                cameraOperator?.startPreview(surfaceTexture)
+            }
+
+            override fun onSurfaceTextureToDestroy(surfaceTexture: SurfaceTexture) {
+            }
+        })
     }
 
     override fun setUpLayout(savedInstanceState: Bundle?) {
@@ -105,6 +113,7 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
     override fun onDestroy() {
         super.onDestroy()
         cameraOperator?.release()
+        cameraRenderer?.onContextDestroy()
     }
 
 }

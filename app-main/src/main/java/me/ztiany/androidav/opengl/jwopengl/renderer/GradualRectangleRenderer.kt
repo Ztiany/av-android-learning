@@ -4,7 +4,7 @@ import android.opengl.GLES20
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.generateVBOBuffer
 import me.ztiany.androidav.opengl.jwopengl.gles2.newVertexCoordinateFull3
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.GLRenderer
 
 class GradualRectangleRenderer : GLRenderer {
 
@@ -28,7 +28,7 @@ class GradualRectangleRenderer : GLRenderer {
     /** 矩形的坐标颜色 */
     private val colorBuffer = generateVBOBuffer(vertexColor)
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_coloring.glsl")
         program.activeAttribute("aPosition")
         program.activeAttribute("aColor")
@@ -48,7 +48,7 @@ class GradualRectangleRenderer : GLRenderer {
         }
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
     }
 
 }

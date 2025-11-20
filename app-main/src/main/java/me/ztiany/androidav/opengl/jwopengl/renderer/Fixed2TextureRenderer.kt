@@ -4,7 +4,7 @@ import android.opengl.GLES20
 import me.ztiany.androidav.R
 import me.ztiany.lib.avbase.utils.loadBitmap
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.GLRenderer
 
 class Fixed2TextureRenderer : GLRenderer {
 
@@ -19,7 +19,7 @@ class Fixed2TextureRenderer : GLRenderer {
     /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         program = GLProgram.fromAssets(
             "shader/vertex_mvp_separated.glsl",
             "shader/fragment_texture.glsl"
@@ -32,7 +32,7 @@ class Fixed2TextureRenderer : GLRenderer {
         program.activeUniform("uViewMatrix")
         program.activeUniform("uProjectionMatrix")
 
-        glTexture = generateTextureFromBitmap(
+        glTexture = GLTexture.generateFromBitmap(
             program.uniformHandle("uTexture"),
             0,
             loadBitmap(R.drawable.beautiful_gril1)
@@ -61,7 +61,7 @@ class Fixed2TextureRenderer : GLRenderer {
         }
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
     }
 
 }

@@ -6,11 +6,10 @@ import android.opengl.EGL14
 import android.opengl.EGLContext
 import android.opengl.GLES11Ext
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
-import me.ztiany.androidav.opengl.jwopengl.gles2.generateTexture
 import me.ztiany.androidav.opengl.jwopengl.filter.GLFilter
 import me.ztiany.androidav.opengl.jwopengl.filter.NoneEffectFBOFilter
 import me.ztiany.androidav.opengl.jwopengl.filter.ScreenFilter
@@ -64,12 +63,12 @@ class RecorderShowRenderer(
         }
     }
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         Timber.d("onSurfaceCreated() called")
 
         eglContext = EGL14.eglGetCurrentContext()
 
-        cameraTexture = generateTexture(
+        cameraTexture = GLTexture.generate(
             GLTexture.NONE,
             0,
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
@@ -125,7 +124,7 @@ class RecorderShowRenderer(
         }
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
         Timber.d("onSurfaceDestroy")
     }
 

@@ -15,12 +15,11 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
     protected var textureWidth = 0
         private set
+
     protected var textureHeight = 0
         private set
 
-    override fun setWorldSize(width: Int, height: Int) {
-
-    }
+    override fun setWorldSize(width: Int, height: Int) = Unit
 
     override fun setTextureAttribute(attribute: TextureAttribute) {
         this.textureWidth = attribute.width
@@ -47,14 +46,14 @@ abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
         if (fbo == null) {
             Timber.d("create new fbo $textureWidth x $textureHeight.")
-            val glTexture = generateFBOTexture(
+            val glTexture = GLTexture.generateFBOTexture(
                 glProgram.uniformHandle("uTexture"),
                 0,
                 //use the real texture size.
                 textureWidth,
                 textureHeight
             )
-            fbo = generateFBOWithTexture(glTexture)
+            fbo = GLFBOWithTexture.generate(glTexture)
             glFBO = fbo
         }
 

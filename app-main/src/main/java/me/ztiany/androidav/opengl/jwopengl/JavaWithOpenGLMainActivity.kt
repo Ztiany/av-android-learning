@@ -4,9 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.androidav.opengl.jwopengl.common.GLController
-import me.ztiany.androidav.opengl.jwopengl.common.GLParams
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.GLParams
+import me.ztiany.androidav.opengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.renderer.*
 import me.ztiany.androidav.opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity
 import me.ztiany.androidav.opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity
@@ -20,7 +19,6 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
     private data class CommonItem(
         override val title: String,
         val renderer: Class<out GLRenderer>,
-        val controller: Class<out GLController>? = null,
         val params: GLParams? = null
     ) : IEntrance
 

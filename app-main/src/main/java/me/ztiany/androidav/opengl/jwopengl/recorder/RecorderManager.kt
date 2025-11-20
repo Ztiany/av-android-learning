@@ -4,8 +4,8 @@ import android.graphics.SurfaceTexture
 import android.opengl.EGLContext
 import android.opengl.GLSurfaceView
 import android.util.Size
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.encoder.Encoder
 import me.ztiany.androidav.opengl.jwopengl.encoder.HardEncoder

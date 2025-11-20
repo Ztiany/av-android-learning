@@ -6,8 +6,9 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
@@ -18,9 +19,9 @@ class CameraRenderer(
 
     private val glMVPMatrix = GLMVPMatrix()
 
-    private lateinit var glProgram: GLProgram
+    private var glProgram: GLProgram? = null
 
-    private lateinit var glTexture: GLTexture
+    private var glTexture: GLTexture? = null
 
     /** 用于修正相机的方向 */
     private var displayOrientation = 0
@@ -28,7 +29,7 @@ class CameraRenderer(
     private var isMirror = false
 
     /** 承载视频的纹理 */
-    private lateinit var surfaceTexture: SurfaceTexture
+    private var surfaceTexture: SurfaceTexture? = null
 
     /** 矩形的坐标 */
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
@@ -36,43 +37,50 @@ class CameraRenderer(
     /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
-    private var onSurfaceTexture: ((SurfaceTexture) -> Unit)? = null
+    private var surfaceTextureListener: SurfaceTextureListener? = null
 
-    fun getSurfaceTexture(onSurfaceText: (SurfaceTexture) -> Unit) {
-        if (::surfaceTexture.isInitialized) {
-            onSurfaceText(surfaceTexture)
-        } else {
-            this.onSurfaceTexture = onSurfaceText
+    fun listenToSurfaceTexture(surfaceTextureListener: SurfaceTextureListener?) {
+        this.surfaceTextureListener = surfaceTextureListener
+        dispatchSurfaceTexture()
+    }
+
+    private fun dispatchSurfaceTexture() {
+        surfaceTexture?.let { st ->
+            surfaceTextureListener?.onSurfaceTextureAvailable(st)
         }
     }
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         Timber.d("onSurfaceCreated")
 
-        glProgram = GLProgram.fromAssets(
-            "shader/vertex_mvp.glsl",
-            "shader/fragment_camera.glsl"
-        )
+        val program = try {
+            GLProgram.fromAssets(
+                "shader/vertex_mvp.glsl",
+                "shader/fragment_camera.glsl"
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "GLProgram create fail,check shader file")
+            return
+        }
+        glProgram = program
 
-        glProgram.activeAttribute("aPosition")
-        glProgram.activeAttribute("aTextureCoordinate")
-        glProgram.activeUniform("uTexture")
-        glProgram.activeUniform("uMVPModelMatrix")
+        with(program) {
+            activeAttribute("aPosition")
+            activeAttribute("aTextureCoordinate")
+            activeUniform("uTexture")
+            activeUniform("uMVPModelMatrix")
+        }
 
-        glTexture = generateTexture(
-            glProgram.uniformHandle("uTexture"),
+        val texture = GLTexture.generate(
+            program.uniformHandle("uTexture"),
             0,
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
         )
+        glTexture = texture
 
-        surfaceTexture = SurfaceTexture(glTexture.id)
-        ContextCompat.getMainExecutor(context).execute {
-            onSurfaceTexture?.invoke(surfaceTexture)
-            onSurfaceTexture = null
-        }
-        surfaceTexture.setOnFrameAvailableListener {
-            onFrameAvailable(it)
-        }
+        surfaceTexture = SurfaceTexture(texture.id)
+        ContextCompat.getMainExecutor(context).execute { dispatchSurfaceTexture() }
+        surfaceTexture?.setOnFrameAvailableListener { eglBridge.requestRender() }
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
@@ -83,10 +91,10 @@ class CameraRenderer(
     }
 
     override fun onDrawFrame(attachment: Any?) {
-        glProgram.startDraw {
+        glProgram?.startDraw {
             clearColorBuffer()
-            glTexture.activeTexture()
-            surfaceTexture.updateTexImage()
+            glTexture?.activeTexture()
+            surfaceTexture?.updateTexImage()
             uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
@@ -94,12 +102,17 @@ class CameraRenderer(
         }
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
         Timber.d("onSurfaceDestroy")
-    }
+        glProgram?.release()
+        glProgram = null
 
-    private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        eglBridge.requestRender()
+        surfaceTexture?.setOnFrameAvailableListener(null)
+        surfaceTexture?.let { surfaceTextureListener?.onSurfaceTextureToDestroy(it) }
+        surfaceTexture = null
+
+        glTexture?.deleteTexture()
+        glTexture = null
     }
 
     fun setVideoAttribute(width: Int, height: Int, displayOrientation: Int, isMirror: Boolean) {

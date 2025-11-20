@@ -22,7 +22,136 @@ class GLTexture(
 ) {
 
     companion object {
+
         const val NONE = -1
+
+        /**
+         * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
+         * - [textureType]: 比如 [GLES20.GL_TEXTURE_2D]，或者 [GLES11Ext.GL_TEXTURE_EXTERNAL_OES] 等。
+         * - [textureIndex]：0-31 闭区间
+         */
+        fun generate(
+            textureHandle: Int,
+            textureIndex: Int,
+            textureType: Int = GLES20.GL_TEXTURE_2D
+        ): GLTexture {
+            //申请纹理
+            val textureObjectIds = allocateTextureObject()
+            //设置通用属性
+            setCommonAttribute(textureType, textureObjectIds[0])
+            //返回纹理封装对象
+            return GLTexture(
+                textureObjectIds[0],
+                textureType,
+                textureHandle,
+                textureIndex,
+                0,
+                0
+            ).apply {
+                Timber.d(
+                    "new GLTexture: $this with Identification ${
+                        getTextureIdentificationByIndex(
+                            index
+                        )
+                    }"
+                )
+            }
+        }
+
+        /**
+         * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
+         * - [bitmap]：纹理图片
+         * - [textureIndex]：0-31 闭区间
+         */
+        fun generateFromBitmap(
+            textureHandle: Int,
+            textureIndex: Int,
+            bitmap: Bitmap
+        ): GLTexture {
+            // 申请纹理
+            val textureObjectIds = allocateTextureObject()
+
+            // 设置通用属性
+            val textureType = GLES20.GL_TEXTURE_2D
+            setCommonAttribute(textureType, textureObjectIds[0])
+
+            // 通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
+            GLES20.glBindTexture(textureType, textureObjectIds[0])
+            GLUtils.texImage2D(textureType, 0, bitmap, 0)
+            GLES20.glBindTexture(textureType, 0)
+
+            // 返回纹理封装对象
+            return GLTexture(
+                textureObjectIds[0],
+                textureType,
+                textureHandle,
+                textureIndex,
+                bitmap.width,
+                bitmap.height
+            ).apply {
+                Timber.d(
+                    "new GLTexture: $this with Identification ${
+                        getTextureIdentificationByIndex(
+                            index
+                        )
+                    }"
+                )
+            }
+        }
+
+        /**
+         * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
+         * - [textureIndex]：0-31 闭区间
+         * - [width]：纹理宽度
+         * - [height]：纹理高度
+         */
+        fun generateFBOTexture(
+            textureHandle: Int = 0,
+            textureIndex: Int,
+            width: Int,
+            height: Int
+        ): GLTexture {
+            // 申请纹理
+            val textureObjectIds = allocateTextureObject()
+
+            // 设置通用属性
+            val textureType = GLES20.GL_TEXTURE_2D
+            setCommonAttribute(textureType, textureObjectIds[0])
+
+            // 这里应该是申请了内存
+            GLES20.glBindTexture(textureType, textureObjectIds[0])
+            GLES20.glTexImage2D(
+                GLES20.GL_TEXTURE_2D,
+                0,
+                GLES20.GL_RGBA,
+                width,
+                height,
+                0,
+                GLES20.GL_RGBA,
+                GLES20.GL_UNSIGNED_BYTE,
+                null
+            )
+            GLES20.glBindTexture(textureType, 0)
+
+            // 返回纹理封装对象
+            return GLTexture(
+                textureObjectIds[0],
+                textureType,
+                textureHandle,
+                textureIndex,
+                width,
+                height
+            ).apply {
+                Timber.d(
+                    "new GLTexture: $this with Identification ${
+                        getTextureIdentificationByIndex(
+                            index
+                        )
+                    }"
+                )
+            }
+        }
+
     }
 
     override fun toString(): String {
@@ -63,109 +192,6 @@ fun GLTexture.deleteTexture() {
     GLES20.glBindTexture(type, 0)
     GLES20.glDeleteTextures(1, intArrayOf(id), 0)
 }
-
-/**
- * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
- * - [textureType]: 比如 [GLES20.GL_TEXTURE_2D]，或者 [GLES11Ext.GL_TEXTURE_EXTERNAL_OES] 等。
- * - [textureIndex]：0-31 闭区间
- */
-fun generateTexture(
-    textureHandle: Int,
-    textureIndex: Int,
-    textureType: Int = GLES20.GL_TEXTURE_2D
-): GLTexture {
-    //申请纹理
-    val textureObjectIds = allocateTextureObject()
-    //设置通用属性
-    setCommonAttribute(textureType, textureObjectIds[0])
-    //返回纹理封装对象
-    return GLTexture(textureObjectIds[0], textureType, textureHandle, textureIndex, 0, 0).apply {
-        Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
-    }
-}
-
-/**
- * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
- * - [bitmap]：纹理图片
- * - [textureIndex]：0-31 闭区间
- */
-fun generateTextureFromBitmap(
-    textureHandle: Int,
-    textureIndex: Int,
-    bitmap: Bitmap
-): GLTexture {
-    // 申请纹理
-    val textureObjectIds = allocateTextureObject()
-
-    // 设置通用属性
-    val textureType = GLES20.GL_TEXTURE_2D
-    setCommonAttribute(textureType, textureObjectIds[0])
-
-    // 通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
-    GLES20.glBindTexture(textureType, textureObjectIds[0])
-    GLUtils.texImage2D(textureType, 0, bitmap, 0)
-    GLES20.glBindTexture(textureType, 0)
-
-    // 返回纹理封装对象
-    return GLTexture(
-        textureObjectIds[0],
-        textureType,
-        textureHandle,
-        textureIndex,
-        bitmap.width,
-        bitmap.height
-    ).apply {
-        Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
-    }
-}
-
-/**
- * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
- * - [textureIndex]：0-31 闭区间
- * - [width]：纹理宽度
- * - [height]：纹理高度
- */
-fun generateFBOTexture(
-    textureHandle: Int = 0,
-    textureIndex: Int,
-    width: Int,
-    height: Int
-): GLTexture {
-    // 申请纹理
-    val textureObjectIds = allocateTextureObject()
-
-    // 设置通用属性
-    val textureType = GLES20.GL_TEXTURE_2D
-    setCommonAttribute(textureType, textureObjectIds[0])
-
-    // 这里应该是申请了内存
-    GLES20.glBindTexture(textureType, textureObjectIds[0])
-    GLES20.glTexImage2D(
-        GLES20.GL_TEXTURE_2D,
-        0,
-        GLES20.GL_RGBA,
-        width,
-        height,
-        0,
-        GLES20.GL_RGBA,
-        GLES20.GL_UNSIGNED_BYTE,
-        null
-    )
-    GLES20.glBindTexture(textureType, 0)
-
-    // 返回纹理封装对象
-    return GLTexture(
-        textureObjectIds[0],
-        textureType,
-        textureHandle,
-        textureIndex,
-        width,
-        height
-    ).apply {
-        Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
-    }
-}
-
 
 private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
     // 绑定到这个纹理对象，之后的纹理操作就是对这个纹理对象进行操作。

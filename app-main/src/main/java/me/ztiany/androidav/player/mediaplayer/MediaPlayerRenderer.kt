@@ -6,8 +6,8 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.lib.avbase.utils.av.MediaMetadata
 import timber.log.Timber
@@ -46,7 +46,7 @@ class MediaPlayerRenderer(
         }
     }
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         Timber.d("onSurfaceCreated")
 
         glProgram = GLProgram.fromAssets(
@@ -59,7 +59,7 @@ class MediaPlayerRenderer(
         glProgram.activeUniform("uTexture")
         glProgram.activeUniform("uMVPModelMatrix")
 
-        glTexture = generateTexture(
+        glTexture = GLTexture.generate(
             glProgram.uniformHandle("uTexture"),
             0,
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
@@ -94,7 +94,7 @@ class MediaPlayerRenderer(
         }
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
         Timber.d("onSurfaceDestroy")
     }
 

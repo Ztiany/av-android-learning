@@ -29,10 +29,6 @@ class EffectSoulFilter : BaseEffectFBOFilter() {
         return glProgram
     }
 
-    override fun setWorldSize(width: Int, height: Int) {
-
-    }
-
     override fun drawOnFBO(sharedTexture: GLTexture) {
         glProgram.startDraw {
             clearColorBuffer()

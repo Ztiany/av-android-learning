@@ -9,12 +9,15 @@ class GLFBOWithTexture(
     override fun toString(): String {
         return "GLFBOWithTexture(id=$id, texture=$texture)"
     }
-}
 
-fun generateFBOWithTexture(glTexture: GLTexture): GLFBOWithTexture {
-    val frameBufferIds = intArrayOf(1)
-    GLES20.glGenFramebuffers(1, frameBufferIds, 0)
-    return GLFBOWithTexture(frameBufferIds[0], glTexture)
+    companion object {
+        fun generate(glTexture: GLTexture): GLFBOWithTexture {
+            val frameBufferIds = intArrayOf(1)
+            GLES20.glGenFramebuffers(1, frameBufferIds, 0)
+            return GLFBOWithTexture(frameBufferIds[0], glTexture)
+        }
+    }
+
 }
 
 fun GLFBOWithTexture.bindFBO() {

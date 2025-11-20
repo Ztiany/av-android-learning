@@ -1,6 +1,7 @@
 package me.ztiany.androidav.opengl.jwopengl.usecase.camera
 
 import android.graphics.Point
+import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.util.Size
 import android.view.SurfaceView
@@ -9,7 +10,12 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import me.ztiany.androidav.R
-import me.ztiany.androidav.opengl.jwopengl.common.*
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.RenderMode
+import me.ztiany.androidav.opengl.common.SurfaceProvider
+import me.ztiany.androidav.opengl.common.SurfaceTextureListener
+import me.ztiany.androidav.opengl.common.SurfaceViewProvider
+import me.ztiany.androidav.opengl.common.TextureViewProvider
 import me.ztiany.androidav.opengl.jwopengl.egl14.EGLAttribute
 import me.ztiany.androidav.opengl.jwopengl.egl14.EGLEnvironment
 import me.ztiany.androidav.opengl.jwopengl.renderer.CameraRenderer
@@ -47,9 +53,16 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
                 isMirror
             )
         }
-        cameraRenderer?.getSurfaceTexture {
-            cameraOperator?.startPreview(it)
-        }
+
+        cameraRenderer?.listenToSurfaceTexture(object : SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture) {
+                cameraOperator?.startPreview(surfaceTexture)
+            }
+
+            override fun onSurfaceTextureToDestroy(surfaceTexture: SurfaceTexture) {
+
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +88,10 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
     }
 
     private fun setUpGlSurfaceView(surfaceProvider: SurfaceProvider) {
-        val eglEnvironment = EGLEnvironment(surfaceProvider, EGLAttribute()).apply {
+        val eglEnvironment = EGLEnvironment(
+            surfaceProvider,
+            EGLAttribute()
+        ).apply {
             renderMode = RenderMode.WhenDirty
         }
 
@@ -88,7 +104,10 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
         this.eglEnvironment = eglEnvironment
         this.cameraRenderer = cameraRenderer
 
-        eglEnvironment.start(cameraRenderer)
+        with(eglEnvironment) {
+            bindRenderers(cameraRenderer)
+            start()
+        }
     }
 
     private fun setUpCamera(point: Point) {

@@ -4,6 +4,7 @@ package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
 import me.ztiany.lib.avbase.utils.FileUtils
+import timber.log.Timber
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -69,6 +70,7 @@ fun newTextureCoordinateAndroid() = floatArrayOf(
     1.0F, 0.0F//right-top
 )
 
+@Throws(IllegalStateException::class)
 fun loadShader(type: Int, shaderCode: String): Int {
     val shader = GLES20.glCreateShader(type)
     // 设置源码
@@ -79,8 +81,11 @@ fun loadShader(type: Int, shaderCode: String): Int {
     // 状态检测
     val status = IntArray(1)
     GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, status, 0)
-    check(status[0] == GLES20.GL_TRUE) {
-        "load vertex shader:" + GLES20.glGetShaderInfoLog(shader)
+    if (status[0] != GLES20.GL_TRUE) {
+        val errorMessage = "load vertex shader: " + GLES20.glGetShaderInfoLog(shader)
+        Timber.e(errorMessage)
+        GLES20.glDeleteShader(shader)
+        throw IllegalStateException(errorMessage)
     }
     return shader
 }
@@ -105,13 +110,20 @@ fun loadFragmentShaderFromAssets(path: String): Int {
     return loadShaderFromAssets(GLES20.GL_FRAGMENT_SHADER, path)
 }
 
+@Throws(IllegalStateException::class)
 fun generateGLProgram(vertexSource: String, fragmentSource: String): Int {
     // 创建着色器程序
     val program = GLES20.glCreateProgram()
+    if (program == 0) {
+        throw IllegalStateException("create program failed.")
+    }
 
     // 加载着色器
     val vShader = loadVertexShader(vertexSource)
     val fShader = loadFragmentShader(fragmentSource)
+    if (vShader == 0 || fShader == 0) {
+        throw IllegalStateException("load shader failed.")
+    }
 
     // 绑定着色器
     GLES20.glAttachShader(program, vShader)
@@ -123,7 +135,11 @@ fun generateGLProgram(vertexSource: String, fragmentSource: String): Int {
     val status = IntArray(1)
     GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, status, 0);
     if (status[0] != GLES20.GL_TRUE) {
-        throw IllegalStateException("link program:" + GLES20.glGetProgramInfoLog(program));
+        val errorMessage = "link program:" + GLES20.glGetProgramInfoLog(program)
+        GLES20.glDeleteShader(vShader)
+        GLES20.glDeleteShader(fShader)
+        GLES20.glDeleteProgram(program)
+        throw IllegalStateException(errorMessage);
     }
 
     // 释放资源

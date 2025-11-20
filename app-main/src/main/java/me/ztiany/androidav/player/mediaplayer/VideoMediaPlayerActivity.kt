@@ -10,8 +10,8 @@ import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
-import me.ztiany.androidav.opengl.jwopengl.common.EGLBridge
-import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
+import me.ztiany.androidav.opengl.common.EGLBridge
+import me.ztiany.androidav.opengl.common.setGLRenderer
 import me.ztiany.lib.avbase.app.activity.BaseActivity
 import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
 import timber.log.Timber

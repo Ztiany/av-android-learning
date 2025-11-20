@@ -2,7 +2,7 @@ package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
 import me.ztiany.lib.avbase.utils.FileUtils
-import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.common.GLRenderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -31,7 +31,7 @@ class TriangleRenderer : GLRenderer {
         return shader
     }
 
-    override fun onSurfaceCreated() {
+    override fun onContextInitialized() {
         //申请 native 空间
         vertexBuffer =
             ByteBuffer.allocateDirect(triangleCoordinate.size * 4 /*one float has four bytes.*/)
@@ -97,7 +97,7 @@ class TriangleRenderer : GLRenderer {
         GLES20.glUseProgram(0)
     }
 
-    override fun onSurfaceDestroy() {
+    override fun onContextDestroy() {
     }
 
 }
