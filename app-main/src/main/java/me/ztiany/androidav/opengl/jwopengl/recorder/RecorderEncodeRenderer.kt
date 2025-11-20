@@ -88,6 +88,8 @@ class RecorderEncodeRenderer : GLRenderer {
 
         encoder?.stop()
         encoder = null
+
+        onContextDestroy()
     }
 
     fun onFrame(frame: TextureWithTime) {

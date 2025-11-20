@@ -124,9 +124,7 @@ class ComposableCameraRenderer(
         glTexture = foundationScreenFilter.onDrawFrame(glTexture)
 
         // send effect to recorder if need.
-        recorder?.run {
-            onFrame(TextureWithTime(glTexture, lSurfaceTexture.timestamp))
-        }
+        recorder?.onFrame(TextureWithTime(glTexture, lSurfaceTexture.timestamp))
     }
 
     override fun onContextDestroy() {

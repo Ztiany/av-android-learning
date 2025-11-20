@@ -39,11 +39,13 @@ class RecorderManager {
         encodeRenderer = RecorderEncodeRenderer()
 
         // init the renderer
-        showRenderer = ComposableCameraRenderer(glSurfaceView.context, object : EGLBridge {
-            override fun requestRender() {
-                glSurfaceView.requestRender()
-            }
-        })
+        showRenderer = ComposableCameraRenderer(
+            glSurfaceView.context,
+            object : EGLBridge {
+                override fun requestRender() {
+                    glSurfaceView.requestRender()
+                }
+            })
 
         glSurfaceView.run {
             setEGLContextClientVersion(2)
@@ -164,6 +166,7 @@ class RecorderManager {
             return
         }
         showRenderer.onContextDestroy()
+
         encodeRenderer.stop()
         encodeRenderer.onContextDestroy()
     }
