@@ -4,7 +4,7 @@
 #include <string>
 #include <android/log.h>
 
-#define DEFAULT_TAG "Native"
+#define DEFAULT_TAG "NativeAV"
 
 void xLog(int priority, const char *tag, const char *format, ...);
 

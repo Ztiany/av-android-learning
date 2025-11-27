@@ -14,6 +14,9 @@ import me.ztiany.androidav.opengl.jwopengl.usecase.OpenGLRecorderActivity
 import me.ztiany.lib.avbase.utils.ui.IEntrance
 import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
+/**
+ * OpenGL ES 2.0（Java） 学习主入口。
+ */
 class JavaWithOpenGLMainActivity : AppCompatActivity() {
 
     private data class CommonItem(

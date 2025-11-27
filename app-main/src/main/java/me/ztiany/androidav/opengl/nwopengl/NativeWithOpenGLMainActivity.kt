@@ -7,6 +7,9 @@ import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
 private const val RENDER_TYPE_BACKGROUND = 0
 
+/**
+ * OpenGL ES 2.0（C++） 学习主入口。
+ */
 class NativeWithOpenGLMainActivity : AppCompatActivity() {
 
     private data class CommonItem(

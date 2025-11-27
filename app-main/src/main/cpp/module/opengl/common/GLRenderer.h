@@ -1,8 +1,8 @@
 #ifndef ANDROID_AV_GLRENDERER_H
 #define ANDROID_AV_GLRENDERER_H
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <jni.h>
 #include <iostream>
 #include <GLES2/gl2.h>

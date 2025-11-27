@@ -27,6 +27,7 @@ class NativeRenderer(
     }
 
     private val handle = AtomicLong(createNativeRenderer(type))
+
     private val handleBackup = handle.get()
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {

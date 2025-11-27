@@ -30,6 +30,10 @@ abstract class BaseActivity<VB : ViewBinding> : DelegateActivity() {
         }
     }
 
+    fun withVB(block: VB.() -> Unit) {
+        binding.block()
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (BackHandlerHelper.handleBackPress(this)) {

@@ -2,12 +2,15 @@
 #include <vector>
 #include <log.h>
 #include "common/GLRenderer.h"
-#include "sample/BackgroundRenderer.hpp"
+#include "sample2/BackgroundRenderer.hpp"
 
 long createNativeRenderer(jint type) {
     GLRenderer *result = nullptr;
     if (type == BackgroundRenderer::TYPE) {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "MemoryLeak"
         auto *renderer = new BackgroundRenderer();
+#pragma clang diagnostic pop
         result = renderer;
     }
     return reinterpret_cast<long>(result);
@@ -15,16 +18,27 @@ long createNativeRenderer(jint type) {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_createNativeRenderer(JNIEnv *env, jobject thiz, jint type) {
+Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_createNativeRenderer(
+        JNIEnv *env,
+        jobject thiz,
+        jint type
+) {
     LOGD("createNativeRenderer");
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "MemoryLeak"
     return createNativeRenderer(type);
+#pragma clang diagnostic pop
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onSurfaceCreated(JNIEnv *env, jobject thiz, jlong handle) {
+Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onSurfaceCreated(
+        JNIEnv *env,
+        jobject thiz,
+        jlong handle
+) {
     LOGD("onSurfaceCreated");
-    if(handle==0){
+    if (handle == 0) {
         LOGD("onSurfaceCreated: handle == 0, ignored");
         return;
     }
@@ -34,9 +48,15 @@ Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onSurfaceCreated(JNIEnv 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onViewportChanged(JNIEnv *env, jobject thiz, jlong handle, jint width, jint height) {
+Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onViewportChanged(
+        JNIEnv *env,
+        jobject thiz,
+        jlong handle,
+        jint width,
+        jint height
+) {
     LOGD("onSurfaceCreated, width = %d, height = %d", width, height);
-    if(handle==0){
+    if (handle == 0) {
         LOGD("onSurfaceCreated: handle == 0, ignored");
         return;
     }
@@ -46,8 +66,12 @@ Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onViewportChanged(JNIEnv
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onDrawFrame(JNIEnv *env, jobject thiz, jlong handle) {
-    if(handle==0){
+Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onDrawFrame(
+        JNIEnv *env,
+        jobject thiz,
+        jlong handle
+) {
+    if (handle == 0) {
         LOGD("onDrawFrame: handle == 0, ignored");
         return;
     }
@@ -57,9 +81,13 @@ Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onDrawFrame(JNIEnv *env,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onSurfaceDestroy(JNIEnv *env, jobject thiz, jlong handle) {
+Java_me_ztiany_androidav_opengl_nwopengl_NativeRenderer_onSurfaceDestroy(
+        JNIEnv *env,
+        jobject thiz,
+        jlong handle
+) {
     LOGD("onSurfaceDestroy");
-    if(handle==0){
+    if (handle == 0) {
         LOGD("onSurfaceDestroy: handle == 0, ignored");
         return;
     }
