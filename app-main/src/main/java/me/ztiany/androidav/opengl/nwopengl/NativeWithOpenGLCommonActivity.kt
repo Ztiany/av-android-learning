@@ -18,7 +18,7 @@ class NativeWithOpenGLCommonActivity : BaseActivity<OpenglActivityNativeCommonBi
     private fun initGlSurfaceView() {
         with(binding.openglGlSurfaceView) {
             setEGLContextClientVersion(2)
-            val type = intent.getIntExtra(KEY_RENDER_TYPE, 0)
+            val type = intent.getIntExtra(KEY_RENDER_TYPE, 1)
             nativeRenderer = NativeRenderer(type, this@NativeWithOpenGLCommonActivity)
             setRenderer(nativeRenderer)
         }

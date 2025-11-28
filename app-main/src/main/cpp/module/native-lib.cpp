@@ -20,6 +20,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_androidav_JNIBridge_initNative(JNIEnv *env, jobject thiz, jobject context, jobject asset_manager) {
+Java_me_ztiany_androidav_JNIBridge_initNative(
+        JNIEnv *env,
+        jobject thiz,
+        jobject context,
+        jobject asset_manager
+) {
     initAssetManager(env, asset_manager);
 }

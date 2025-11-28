@@ -3,18 +3,27 @@
 #include <log.h>
 #include "common/GLRenderer.h"
 #include "sample2/BackgroundRenderer.hpp"
+#include "sample2/TriangleRenderer.hpp"
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "MemoryLeak"
 
 long createNativeRenderer(jint type) {
     GLRenderer *result = nullptr;
     if (type == BackgroundRenderer::TYPE) {
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "MemoryLeak"
         auto *renderer = new BackgroundRenderer();
-#pragma clang diagnostic pop
         result = renderer;
     }
+    if (type == TriangleRenderer::TYPE) {
+        auto *renderer = new TriangleRenderer();
+        result = renderer;
+    }
+
     return reinterpret_cast<long>(result);
 }
+
+#pragma clang diagnostic pop
+
 
 extern "C"
 JNIEXPORT jlong JNICALL

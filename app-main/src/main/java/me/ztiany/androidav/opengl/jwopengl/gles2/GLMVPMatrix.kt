@@ -92,7 +92,9 @@ class GLMVPMatrix {
         )
     }
 
-    /** 设置为正交投影 */
+    /**
+     * 设置为正交投影。会根据窗口与模型的宽高比进行调整，保证模型不变形显示全部内容。
+     */
     fun adjustToOrthogonal(
         near: Float = DEFAULT_NEAR,
         far: Float = DEFAULT_FAR
@@ -112,9 +114,14 @@ class GLMVPMatrix {
             worldRatio, originRatio
         )
 
+        // 窗口为横屏
         if (worldWidth > worldHeight) {
+            // 原始比例大于窗口比例，缩放宽度会导致宽度超出，因此，宽度以窗口为准，缩放高度
             if (originRatio > worldRatio) {
+                // 计算实际需要的比例
                 val actualRatio = originRatio / worldRatio
+                // 设置正交投影，左右设置为 -1 到 1，表示宽度不变，而上下根据比例进行缩放，
+                // 这里的比例大于 1，因此会在 y 轴方向进行缩放。
                 Matrix.orthoM(
                     projectionMatrix, 0,
                     -1F, 1F,

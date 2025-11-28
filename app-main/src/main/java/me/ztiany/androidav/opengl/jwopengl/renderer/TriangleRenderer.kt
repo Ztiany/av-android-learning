@@ -47,13 +47,13 @@ class TriangleRenderer : GLRenderer {
     }
 
     override fun onContextInitialized() {
-        //申请 native 空间,每个 float 占 4 个字节。
+        //申请 native 空间，每个 float 占 4 个字节。
         vertexBuffer = ByteBuffer.allocateDirect(triangleCoordinate.size * 4)
             .order(ByteOrder.nativeOrder())
             .asFloatBuffer()
             .put(triangleCoordinate).also {
                 it.position(0)
-            }//将坐标数据转换为 FloatBuffer
+            }// 将坐标数据转换为 FloatBuffer
 
         // 生成 Shader
         val vertexShader = loadShader(

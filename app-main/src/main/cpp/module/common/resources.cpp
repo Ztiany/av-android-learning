@@ -10,7 +10,7 @@ void initAssetManager(JNIEnv *env, jobject assetManager) {
     LOGD("sAssetManager has been initialized. result = %d", sAssetManager != nullptr);
 }
 
-unsigned char *loadFileContent(const char *path, int &fileSize) {
+unsigned char *loadAssetContent(const char *path, size_t &fileSize) {
     unsigned char *fileContent = nullptr;
     fileSize = 0;
     AAsset *asset = AAssetManager_open(sAssetManager, path, AASSET_MODE_UNKNOWN);

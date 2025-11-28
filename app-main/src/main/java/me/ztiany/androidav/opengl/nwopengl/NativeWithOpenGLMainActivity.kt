@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.lib.avbase.utils.ui.IEntrance
 import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
-private const val RENDER_TYPE_BACKGROUND = 0
+private const val RENDER_TYPE_BACKGROUND = 1
 
 /**
  * OpenGL ES 2.0（C++） 学习主入口。

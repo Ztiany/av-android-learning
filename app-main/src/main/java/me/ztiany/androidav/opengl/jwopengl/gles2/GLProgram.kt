@@ -66,6 +66,7 @@ class GLProgram private constructor(
      * - elementsPerVertex: 每个点几个 float。
      */
     fun vertexAttribPointerFloat(attribute: String, elementsPerVertex: Int, vbo: FloatBuffer) {
+        // glVertexAttribPointer 函数在这里用于向 shader 传递顶点数据。
         GLES20.glVertexAttribPointer(
             attributeHandle(attribute),
             elementsPerVertex,
@@ -84,6 +85,7 @@ class GLProgram private constructor(
      * - elementsPerVertex: 每个点几个 float。
      */
     fun vertexAttribPointerInt(attribute: String, elementsPerVertex: Int, vbo: FloatBuffer) {
+        // glVertexAttribPointer 函数在这里向 shader 传递 int 数据。
         GLES20.glVertexAttribPointer(
             attributeHandle(attribute),
             elementsPerVertex,
