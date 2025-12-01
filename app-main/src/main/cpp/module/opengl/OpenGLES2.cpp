@@ -1,25 +1,28 @@
 #include <jni.h>
 #include <vector>
 #include <log.h>
+
 #include "common/GLRenderer.h"
 #include "sample2/BackgroundRenderer.hpp"
 #include "sample2/TriangleRenderer.hpp"
+#include "sample2/TriangleVBORenderer.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemoryLeak"
 
 long createNativeRenderer(jint type) {
-    GLRenderer *result = nullptr;
-    if (type == BackgroundRenderer::TYPE) {
-        auto *renderer = new BackgroundRenderer();
-        result = renderer;
-    }
-    if (type == TriangleRenderer::TYPE) {
-        auto *renderer = new TriangleRenderer();
-        result = renderer;
+    static const std::unordered_map<int, std::function<GLRenderer *()>> creators = {
+            {BackgroundRenderer::TYPE,  []() { return new BackgroundRenderer(); }},
+            {TriangleRenderer::TYPE,    []() { return new TriangleRenderer(); }},
+            {TriangleVBORenderer::TYPE, []() { return new TriangleVBORenderer(); }},
+    };
+
+    auto it = creators.find(type);
+    if (it != creators.end()) {
+        return reinterpret_cast<long>(it->second());
     }
 
-    return reinterpret_cast<long>(result);
+    return reinterpret_cast<long>(nullptr);
 }
 
 #pragma clang diagnostic pop

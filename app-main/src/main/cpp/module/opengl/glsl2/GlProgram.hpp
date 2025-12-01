@@ -11,37 +11,40 @@ using HandleCache = std::unordered_map<std::string, GLint>;
 /**
  * @brief 封装 OpenGL 着色器程序的类。
  */
-class Program {
+class GlProgram {
 private:
     GLuint programId;
 
     HandleCache glAttributeHandleCache = {};
     HandleCache glUniformHandleCache = {};
 
-    explicit Program(GLuint programId) {
+    explicit GlProgram(GLuint programId) {
         this->programId = programId;
     }
 
 public:
-    ~Program() {
+    ~GlProgram() {
         glDeleteProgram(programId);
     }
 
-    static Program *fromAssets(const char *vertexShaderPath, const char *fragmentShaderPath) {
+    static GlProgram *fromAssets(const char *vertexShaderPath, const char *fragmentShaderPath) {
         GLuint id = createProgramFromAssets(
                 vertexShaderPath,
                 fragmentShaderPath
         );
-        return new Program(id);
+        return new GlProgram(id);
     }
 
-    static Program *fromShaders(const char *vertexShaderCode, const char *fragmentShaderCode) {
+    static GlProgram *fromShaders(const char *vertexShaderCode, const char *fragmentShaderCode) {
         GLuint id = createProgramFromShaderCode(
                 vertexShaderCode,
                 fragmentShaderCode
         );
-        return new Program(id);
+        return new GlProgram(id);
     }
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-convert-member-functions-to-static"
 
     /**
      * 设置背景颜色。
@@ -50,23 +53,30 @@ public:
      * @param blue  蓝色，范围 [0.0, 1.0]
      * @param alpha  透明度，范围 [0.0, 1.0]，0.0 表示完全透明，1.0 表示完全不透明
      */
-    static void setBgColor(float red, float green, float blue, float alpha) {
+    void setBgColor(float red, float green, float blue, float alpha) {
         glClearColor(red, green, blue, alpha);
     }
 
-    /**
-     * 清除颜色缓冲区、深度缓冲区和模板缓冲区。
-     */
-    static void clearBuffer() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    void drawArraysStrip(int count) {
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
     }
 
     /**
      * 清除颜色缓冲区。相当于用预设的背景颜色填充整个颜色缓冲区。
      */
-    static void clearColorBuffer() {
+    void clearColorBuffer() {
         glClear(GL_COLOR_BUFFER_BIT);
     }
+
+    /**
+     * 清除颜色缓冲区、深度缓冲区和模板缓冲区。
+     */
+    void clearBuffer() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+
+#pragma clang diagnostic pop
+
 
     GLint activeAttribute(const std::string &name) {
         if (glAttributeHandleCache.find(name) != glAttributeHandleCache.end()) {
@@ -86,7 +96,7 @@ public:
         return handle;
     }
 
-    void startDraw(const std::function<void(Program &)> &onDraw) {
+    void startDraw(const std::function<void(GlProgram &)> &onDraw) {
         glUseProgram(programId);
 
         // 启用所有顶点属性数组
@@ -105,21 +115,23 @@ public:
         glUseProgram(0);
     }
 
-    static void drawArraysStrip(int count) {
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
-    }
 
     void vertexAttribPointerFloat(
             const std::string &name,
             GLint elementsPerVertex,
-            const void *pointer
+            const void *pointer,
+            const int stride = -1
     ) {
+        int realStride = stride;
+        if (realStride == -1) {
+            realStride = static_cast<GLsizei>(elementsPerVertex * sizeof(float));
+        }
         glVertexAttribPointer(
                 activeAttribute(name),
                 elementsPerVertex,
                 GL_FLOAT,
                 GL_FALSE,
-                static_cast<GLsizei>(elementsPerVertex * sizeof(float)),
+                realStride,
                 pointer
         );
     }
@@ -127,14 +139,19 @@ public:
     void vertexAttribPointerInt(
             const std::string &name,
             GLint elementsPerVertex,
-            const void *pointer
+            const void *pointer,
+            const int stride = -1
     ) {
+        int realStride = stride;
+        if (realStride == -1) {
+            realStride = static_cast<GLsizei>(elementsPerVertex * sizeof(int));
+        }
         glVertexAttribPointer(
                 activeAttribute(name),
                 elementsPerVertex,
                 GL_INT,
                 GL_FALSE,
-                static_cast<GLsizei>(elementsPerVertex * sizeof(int)),
+                realStride,
                 pointer
         );
     }

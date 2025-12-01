@@ -59,7 +59,7 @@ class CameraRenderer(
                 "shader/fragment_camera.glsl"
             )
         } catch (e: Exception) {
-            Timber.e(e, "GLProgram create fail,check shader file")
+            Timber.e(e, "GlProgram create fail,check shader file")
             return
         }
         glProgram = program

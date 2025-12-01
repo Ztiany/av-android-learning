@@ -6,7 +6,7 @@
 class BackgroundRenderer : public GLRenderer {
 
 public:
-    static const int TYPE = 1;
+    static constexpr int TYPE = 1;
 
     void onSurfaceCreated() override {
         /*
