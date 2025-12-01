@@ -7,6 +7,17 @@ private:
     Program *program = nullptr;
     GlMVPMatrix *mvpMatrix = nullptr;
 
+    float positions[12] = {
+            0.0F, 0.5F, 0.0F, 1,  // top
+            -0.5F, -0.5F, 0.0F, 1, // bottom left
+            0.5F, -0.5F, 0.0F, 1, // bottom right
+    };//x,y,z,w
+
+    float colors[12] = {
+            1.0F, 0.0F, 0.0F, 1.0F,
+            0.0F, 1.0F, 0.0F, 1.0F,
+            0.0F, 0.0F, 1.0F, 1.0F,
+    };//r,g,b,a
 public:
 
     static const int TYPE = 2;
@@ -14,8 +25,15 @@ public:
     void onSurfaceCreated() override {
         program = Program::fromAssets(
                 "shader/vertex_mvp_separated.glsl",
-                "shaders/fragment_color.glsl"
+                "shader/fragment_coloring.glsl"
         );
+
+        program->activeAttribute("aPosition");
+        program->activeAttribute("aColor");
+
+        program->activeUniform("uModelMatrix");
+        program->activeUniform("uViewMatrix");
+        program->activeUniform("uProjectionMatrix");
 
         mvpMatrix = new GlMVPMatrix();
     }
@@ -26,13 +44,30 @@ public:
         mvpMatrix->setWorldSize((float) width, (float) height);
         // 这里是绘制三角形，所以模型大小设置为视口大小。
         mvpMatrix->setModelSize((float) width, (float) height);
+        // 摆放相机
+        mvpMatrix->lookAtDefault();
+        // 正交投影
+        mvpMatrix->projectOrthogonally();
     }
 
     void onDrawFrame(void *data) override {
-        // 清除颜色缓冲区
-        glClear(GL_COLOR_BUFFER_BIT);
+        program->startDraw([
+                                   model = mvpMatrix->getModelMatrixPtr(),
+                                   view = mvpMatrix->getViewMatrixPtr(),
+                                   projection = mvpMatrix->getProjectionMatrixPtr(),
+                                   positions = this->positions,
+                                   colors = this->colors
+                           ](Program &program) {
 
-        // 这里可以添加绘制三角形的代码
+            program.uniformMatrix4fv("uModelMatrix", model);
+            program.uniformMatrix4fv("uViewMatrix", view);
+            program.uniformMatrix4fv("uProjectionMatrix", projection);
+
+            program.vertexAttribPointerFloat("aPosition", 4, positions);
+            program.vertexAttribPointerFloat("aColor", 4, colors);
+
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        });
     }
 
     void onSurfaceDestroy() override {

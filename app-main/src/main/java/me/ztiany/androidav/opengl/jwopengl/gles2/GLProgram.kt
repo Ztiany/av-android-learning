@@ -62,6 +62,10 @@ class GLProgram private constructor(
         GLES20.glUseProgram(0)
     }
 
+    fun drawArraysStrip(count: Int) {
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, count)
+    }
+
     /**
      * - elementsPerVertex: 每个点几个 float。
      */
@@ -75,10 +79,6 @@ class GLProgram private constructor(
             elementsPerVertex * 4/* 每个点 4 个 float，每个 float 4 个 byte */,
             vbo
         )
-    }
-
-    fun drawArraysStrip(count: Int) {
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, count)
     }
 
     /**

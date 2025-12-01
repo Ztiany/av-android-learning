@@ -201,10 +201,10 @@ public:
     // Getter 方法 - 添加 const 修饰符
 
     /**
-     * 获取 MVP 矩阵指针 (const)。
-     * @return 指向 MVP 矩阵数据的常量指针
+     * 获取模型矩阵指针 (const)。
+     * @return 指向模型矩阵数据的常量指针
      */
-    const float *getMVPMatrixPtr() const {
+    [[nodiscard]]  const float *getModelMatrixPtr() const {
         /*
          * value_ptr 将 GLM 矩阵/向量转换为原始 float 指针，用于与 OpenGL API 交互。
          *
@@ -213,14 +213,6 @@ public:
          *      数据连续性：确保矩阵数据在内存中是连续的。
          *      类型安全：避免手动类型转换的错误。
          */
-        return glm::value_ptr(mvpMatrix);
-    }
-
-    /**
-     * 获取模型矩阵指针 (const)。
-     * @return 指向模型矩阵数据的常量指针
-     */
-    const float *getModelMatrixPtr() const {
         return glm::value_ptr(modelMatrix);
     }
 
@@ -228,7 +220,7 @@ public:
      * 获取视图矩阵指针 (const)。
      * @return 指向视图矩阵数据的常量指针
      */
-    const float *getViewMatrixPtr() const {
+    [[nodiscard]] const float *getViewMatrixPtr() const {
         return glm::value_ptr(viewMatrix);
     }
 
@@ -236,7 +228,7 @@ public:
      * 获取投影矩阵指针 (const)。
      * @return 指向投影矩阵数据的常量指针
      */
-    const float *getProjectionMatrixPtr() const {
+    [[nodiscard]] const float *getProjectionMatrixPtr() const {
         return glm::value_ptr(projectionMatrix);
     }
 
@@ -244,8 +236,8 @@ public:
      * 获取 MVP 矩阵的拷贝。
      * @return MVP 矩阵的拷贝
      */
-    glm::mat4 getMVPMatrix() const {
-        return mvpMatrix;
+    [[nodiscard]]  const float *getMVPMatrix() const {
+        return glm::value_ptr(mvpMatrix);
     }
 
 private:
@@ -260,7 +252,7 @@ private:
      * 检查矩阵是否需要重新计算。
      * @return true 如果需要重新计算
      */
-    bool needsUpdate() const {
+    [[nodiscard]] bool needsUpdate() const {
         return isDirty;
     }
 };

@@ -6,6 +6,7 @@ import me.ztiany.lib.avbase.utils.ui.IEntrance
 import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
 private const val RENDER_TYPE_BACKGROUND = 1
+private const val RENDER_TYPE_TRIANGLE = 2
 
 /**
  * OpenGL ES 2.0（C++） 学习主入口。
@@ -19,6 +20,7 @@ class NativeWithOpenGLMainActivity : AppCompatActivity() {
 
     private val entrances = listOf(
         CommonItem("绘制背景", RENDER_TYPE_BACKGROUND),
+        CommonItem("绘制渐变三角形", RENDER_TYPE_TRIANGLE),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +37,7 @@ class NativeWithOpenGLMainActivity : AppCompatActivity() {
 
     private fun handleClicked(index: Int) {
         val item = entrances[index]
-        if (item is CommonItem) {
-            NativeWithOpenGLCommonActivity.start(this, item.title, item.rendererType)
-        }
+        NativeWithOpenGLCommonActivity.start(this, item.title, item.rendererType)
     }
 
 }
