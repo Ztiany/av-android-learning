@@ -3,16 +3,20 @@
 #include "../opengl/glsl2/GlMVPMatrix.hpp"
 #include "../opengl/glsl2/GlBO.hpp"
 
-class TriangleVBORenderer : public GLRenderer {
+class RectangleVBORenderer : public GLRenderer {
 private:
     GlProgram *program = nullptr;           // 着色器程序指针
     GlMVPMatrix *mvpMatrix = nullptr;     // MVP 矩阵管理器指针
     GlBO *vbo = nullptr;                 // 顶点缓冲对象指针
+    GlBO *ibo = nullptr;                 // 索引缓冲对象指针
 
-    // 三角形顶点位置数据 (x,y,z,w) + 颜色数据 (r,g,b,a) - 存储在同一个 VBO 中。
-    float vboData[24] = {
-            0.0F, 0.5F, 0.0F, 1,  // 顶部顶点
+    // 四个顶点位置数据 (x,y,z,w) + 颜色数据 (r,g,b,a) - 存储在同一个 VBO 中。
+    float vboData[32] = {
+            -0.5F, 0.5F, 0.0F, 1,  // 左上角
             1.0F, 0.0F, 0.0F, 1.0F,  // 红色
+
+            0.5F, 0.5F, 0.0F, 1,  // 右上角
+            1.0F, 1.0F, 1.0F, 1.0F,  // 白色
 
             -0.5F, -0.5F, 0.0F, 1, // 左下顶点
             0.0F, 1.0F, 0.0F, 1.0F,  // 绿色
@@ -21,10 +25,15 @@ private:
             0.0F, 0.0F, 1.0F, 1.0F,  // 蓝色
     };
 
-public:
-    static constexpr int TYPE = 3;  // 渲染器类型标识符
+    unsigned short indexes[6] = {
+            0, 1, 2,
+            1, 3, 2
+    };
 
-    ~TriangleVBORenderer() override {
+public:
+    static constexpr int TYPE = 4;  // 渲染器类型标识符
+
+    ~RectangleVBORenderer() override {
         release();
     }
 
@@ -51,6 +60,13 @@ public:
         vbo = GlBO::createVBO(
                 sizeof(vboData),
                 vboData,
+                GL_STATIC_DRAW
+        );
+
+        // 创建 IBO 并初始化数据
+        ibo = GlBO::createIBO(
+                sizeof(indexes),
+                indexes,
                 GL_STATIC_DRAW
         );
     }
@@ -83,7 +99,8 @@ public:
                                    model = mvpMatrix->getModelMatrixPtr(),
                                    view = mvpMatrix->getViewMatrixPtr(),
                                    projection = mvpMatrix->getProjectionMatrixPtr(),
-                                   vbo = this->vbo
+                                   vbo = this->vbo,
+                                   ibo = this->ibo
                                    // 参数列表: 接收Program对象的引用
                            ](GlProgram &program) {
             program.clearBuffer();
@@ -115,9 +132,18 @@ public:
             // 解绑 VBO
             vbo->unbind();
 
-            // 执行绘制命令: 绘制三角形
-            // GL_TRIANGLES: 将顶点按照三个一组的方式绘制成三角形
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            // 绑定 IBO
+            ibo->bind();
+            // 执行绘制命令: 绘制矩形（由两个三角形组成）
+            glDrawElements(
+                    GL_TRIANGLES,
+                    6,
+                    // GL_UNSIGNED_SHORT 对应 C++ 中的 unsigned short 类型。创建 ibo 时使用的就该类型的数据。
+                    GL_UNSIGNED_SHORT,
+                    nullptr
+            );
+            // 解绑 IBO
+            ibo->unbind();
         });
     }
 
@@ -138,6 +164,10 @@ public:
         if (vbo) {
             delete vbo;         // 删除 VBO 对象
             vbo = nullptr;      // 避免悬垂指针
+        }
+        if (ibo) {
+            delete ibo;         // 删除 IBO 对象
+            ibo = nullptr;      // 避免悬垂指针
         }
     }
 

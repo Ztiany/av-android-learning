@@ -6,6 +6,7 @@
 #include "sample2/BackgroundRenderer.hpp"
 #include "sample2/TriangleRenderer.hpp"
 #include "sample2/TriangleVBORenderer.hpp"
+#include "sample2/RectangleVBORenderer.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemoryLeak"
@@ -15,6 +16,7 @@ long createNativeRenderer(jint type) {
             {BackgroundRenderer::TYPE,  []() { return new BackgroundRenderer(); }},
             {TriangleRenderer::TYPE,    []() { return new TriangleRenderer(); }},
             {TriangleVBORenderer::TYPE, []() { return new TriangleVBORenderer(); }},
+            {RectangleVBORenderer::TYPE, []() { return new RectangleVBORenderer(); }},
     };
 
     auto it = creators.find(type);
