@@ -47,6 +47,7 @@ file(
         GLOB SRC-FILES
         #common
         ${CMAKE_SOURCE_DIR}/module/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/common/*.c
         ${CMAKE_SOURCE_DIR}/module/common/*.cpp
         #opengl
         ${CMAKE_SOURCE_DIR}/module/opengl/*.cpp

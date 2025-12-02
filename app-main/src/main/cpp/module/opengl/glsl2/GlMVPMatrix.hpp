@@ -18,7 +18,6 @@ private:
     /** 视点原点（Camera 位置）到远平面的距离 */
     static constexpr float DEFAULT_FAR = 10.0F;
 
-    static constexpr float EPSILON = 1e-6F;
 private:
     // 矩阵数据
     glm::mat4 modelMatrix;
@@ -27,10 +26,10 @@ private:
     glm::mat4 mvpMatrix;
 
     // 尺寸数据
-    float modelWidth;
-    float modelHeight;
-    float worldWidth;
-    float worldHeight;
+    int modelWidth;
+    int modelHeight;
+    int worldWidth;
+    int worldHeight;
 
     // 状态标志
     bool isDirty;  // 新增：标记矩阵是否需要重新计算
@@ -39,15 +38,15 @@ public:
     /**
      * 构造函数 - 使用成员初始化列表。
      */
-    GlMVPMatrix() : modelMatrix(1.0f), // GLM 单位矩阵初始化
-                    viewMatrix(1.0f),
-                    projectionMatrix(1.0f),
-                    mvpMatrix(1.0f),
+    GlMVPMatrix() : modelMatrix(1.0F), // GLM 单位矩阵初始化
+                    viewMatrix(1.0F),
+                    projectionMatrix(1.0F),
+                    mvpMatrix(1.0F),
             // 尺寸数据
-                    modelWidth(0.0f),
-                    modelHeight(0.0f),
-                    worldWidth(0.0f),
-                    worldHeight(0.0f),
+                    modelWidth(0.0F),
+                    modelHeight(0.0F),
+                    worldWidth(0.0F),
+                    worldHeight(0.0F),
             // 初始状态为干净
                     isDirty(false) {
     }
@@ -57,10 +56,11 @@ public:
      * @param width 模型宽度
      * @param height 模型高度
      */
-    void setModelSize(float width, float height) {
+    void setModelSize(int width, int height) {
+        LOGD("setModelSize: width=%d, height=%d", width, height);
         // 使用浮点数精度安全比较
-        if (std::abs(modelWidth - width) > EPSILON ||
-            std::abs(modelHeight - height) > EPSILON) {
+        if (std::abs(modelWidth - width) > 0 ||
+            std::abs(modelHeight - height) > 0) {
             modelWidth = width;
             modelHeight = height;
             markDirty();  // 标记需要重新计算
@@ -72,9 +72,10 @@ public:
      * @param width 世界宽度
      * @param height 世界高度
      */
-    void setWorldSize(float width, float height) {
-        if (std::abs(worldWidth - width) > EPSILON ||
-            std::abs(worldHeight - height) > EPSILON) {
+    void setWorldSize(int width, int height) {
+        LOGD("setWorldSize: width=%d, height=%d", width, height);
+        if (std::abs(worldWidth - width) > 0 ||
+            std::abs(worldHeight - height) > 0) {
             worldWidth = width;
             worldHeight = height;
             markDirty();
@@ -118,13 +119,13 @@ public:
      */
     void projectOrthogonally(float near = DEFAULT_NEAR, float far = DEFAULT_FAR) {
         // 安全检查
-        if (worldHeight < EPSILON || worldWidth < EPSILON ||
-            modelHeight < EPSILON || modelWidth < EPSILON) {
+        if (worldHeight <= 0 || worldWidth <= 0 ||
+            modelHeight <= 0 || modelWidth <= 0) {
             return;
         }
 
-        const float worldRatio = worldWidth / worldHeight;
-        const float modelRatio = modelWidth / modelHeight;
+        const float worldRatio = static_cast<float>(worldWidth) / static_cast<float>(worldHeight);
+        const float modelRatio = static_cast<float>(modelWidth) / static_cast<float>(modelHeight);
 
         float left, right, bottom, top;
 
@@ -146,6 +147,9 @@ public:
         }
 
         // 创建正交投影矩阵
+        LOGD("projectOrthogonally: left=%f, right=%f, bottom=%f, top=%f, near=%f, far=%f",
+             left, right, bottom, top, near, far
+        );
         projectionMatrix = glm::ortho(left, right, bottom, top, near, far);
         markDirty();
     }

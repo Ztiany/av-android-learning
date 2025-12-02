@@ -7,16 +7,18 @@
 #include "sample2/TriangleRenderer.hpp"
 #include "sample2/TriangleVBORenderer.hpp"
 #include "sample2/RectangleVBORenderer.hpp"
+#include "sample2/TextureRenderer.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemoryLeak"
 
 long createNativeRenderer(jint type) {
     static const std::unordered_map<int, std::function<GLRenderer *()>> creators = {
-            {BackgroundRenderer::TYPE,  []() { return new BackgroundRenderer(); }},
-            {TriangleRenderer::TYPE,    []() { return new TriangleRenderer(); }},
-            {TriangleVBORenderer::TYPE, []() { return new TriangleVBORenderer(); }},
+            {BackgroundRenderer::TYPE,   []() { return new BackgroundRenderer(); }},
+            {TriangleRenderer::TYPE,     []() { return new TriangleRenderer(); }},
+            {TriangleVBORenderer::TYPE,  []() { return new TriangleVBORenderer(); }},
             {RectangleVBORenderer::TYPE, []() { return new RectangleVBORenderer(); }},
+            {TextureRenderer::TYPE,      []() { return new TextureRenderer(); }},
     };
 
     auto it = creators.find(type);

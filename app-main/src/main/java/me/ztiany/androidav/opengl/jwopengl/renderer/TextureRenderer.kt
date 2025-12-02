@@ -40,7 +40,7 @@ class TextureRenderer : GLRenderer {
         glTexture = GLTexture.generateFromBitmap(
             program.uniformHandle("uTexture"),
             0,
-            loadBitmap(R.drawable.beautiful_gril1)
+            loadBitmap(R.drawable.beautiful_girl1)
         )
     }
 

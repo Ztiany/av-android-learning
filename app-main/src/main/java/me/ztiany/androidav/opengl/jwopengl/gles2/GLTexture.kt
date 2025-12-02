@@ -211,7 +211,7 @@ private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
 
-    //操作完了，就解除绑定
+    // 操作完了，就解除绑定
     GLES20.glBindTexture(textureType, 0)
 }
 

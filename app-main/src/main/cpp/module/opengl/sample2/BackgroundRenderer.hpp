@@ -31,12 +31,12 @@ public:
          *  - GL_DEPTH_BUFFER_BIT：指定要清除深度缓冲区。
          *  - GL_STENCIL_BUFFER_BIT：指定要清除模板缓冲区。
          *
-         * glClear 函数将所有指定的缓冲区的值设置为预定义的值。对于颜色缓冲区，预定义的值为当前的清除颜色（可以使用 glClearColor 函数设置）。
-         * 对于深度缓冲区，预定义的值为最大深度值；对于模板缓冲区，预定义的值为零。可以使用 glDepthFunc 和 glStencilFunc 函数设置深度函数
-         * 和模板函数，以控制深度测试和模板测试的结果。
+         * glClear 函数将所有指定的缓冲区的值设置为预定义的值。对于颜色缓冲区，预定义的值为当前的清除颜色（可以使用
+         * glClearColor 函数设置）。对于深度缓冲区，预定义的值为最大深度值；对于模板缓冲区，预定义的值为零。可以使用
+         * glDepthFunc 和 glStencilFunc 函数设置深度函数和模板函数，以控制深度测试和模板测试的结果。
          *
-         * 需要注意的是，glClear 函数只是将缓冲区的值设置为预定义的值，它并不会更新窗口的内容。要更新窗口的内容，需要使用其他 OpenGL 函数，
-         * 例如 glFlush 和 glSwapBuffers。
+         * 需要注意的是，glClear 函数只是将缓冲区的值设置为预定义的值，它并不会更新窗口的内容。要更新窗口的内容，需要使用
+         * 其他 OpenGL 函数，例如 glFlush 和 glSwapBuffers。
          */
         glClear(GL_COLOR_BUFFER_BIT);
     }

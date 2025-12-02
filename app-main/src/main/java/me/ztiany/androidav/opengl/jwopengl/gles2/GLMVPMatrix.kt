@@ -83,11 +83,11 @@ class GLMVPMatrix {
     ) {
         Matrix.setLookAtM(
             viewMatrix, 0,
-            //相机位置
+            // 相机位置
             eyeX, eyeY, eyeZ,
-            //看向哪个点【这个点要在裁剪区域内，即保证其在近平面与远平面的区间内】
+            // 看向哪个点【这个点要在裁剪区域内，即保证其在近平面与远平面的区间内】
             centerX, centerY, centerZ,
-            //决定哪个坐标轴竖直向上，且该向量与视线是垂直的，可理解为人正常平视物体时，头顶所指方向为竖直向上向量，视线此刻与该向量垂直的。
+            // 决定哪个坐标轴竖直向上，且该向量与视线是垂直的，可理解为人正常平视物体时，头顶所指方向为竖直向上向量，视线此刻与该向量垂直的。
             upX, upY, upZ
         )
     }
@@ -114,47 +114,40 @@ class GLMVPMatrix {
             worldRatio, originRatio
         )
 
-        // 窗口为横屏
-        if (worldWidth > worldHeight) {
-            // 原始比例大于窗口比例，缩放宽度会导致宽度超出，因此，宽度以窗口为准，缩放高度
-            if (originRatio > worldRatio) {
-                // 计算实际需要的比例
-                val actualRatio = originRatio / worldRatio
-                // 设置正交投影，左右设置为 -1 到 1，表示宽度不变，而上下根据比例进行缩放，
-                // 这里的比例大于 1，因此会在 y 轴方向进行缩放。
-                Matrix.orthoM(
-                    projectionMatrix, 0,
-                    -1F, 1F,
-                    -actualRatio, actualRatio,
-                    near, far
-                )
-            } else {// 原始比例小于窗口比例，缩放高度度会导致高度超出，因此，高度以窗口为准，缩放宽度
-                val actualRatio = worldRatio / originRatio
-                Matrix.orthoM(
-                    projectionMatrix, 0,
-                    -actualRatio, actualRatio,
-                    -1F, 1F,
-                    near, far
-                )
-            }
-        } else {
-            if (originRatio > worldRatio) {
-                val actualRatio = originRatio / worldRatio
-                Matrix.orthoM(
-                    projectionMatrix, 0,
-                    -1F, 1F,
-                    -actualRatio, actualRatio,
-                    near, far
-                )
-            } else {// 原始比例小于窗口比例，缩放高度会导致高度超出，因此，高度以窗口为准，缩放宽度
-                val actualRatio = worldRatio / originRatio
-                Matrix.orthoM(
-                    projectionMatrix, 0,
-                    -actualRatio, actualRatio,
-                    -1F, 1F,
-                    near, far
-                )
-            }
+        // 原始比例大于窗口比例，缩放宽度会导致宽度超出，因此，宽度以窗口为准，缩放高度
+        if (originRatio > worldRatio) {
+            // 计算实际需要的比例
+            val actualRatio = originRatio / worldRatio
+            // 设置正交投影，左右设置为 -1 到 1，表示宽度不变，而上下根据比例进行缩放，
+            // 这里的比例大于 1，因此会在 y 轴方向进行缩放。
+            Matrix.orthoM(
+                projectionMatrix, 0,
+                -1F, 1F,
+                -actualRatio, actualRatio,
+                near, far
+            )
+            Timber.d(
+                "projectOrthogonally: left=%f, right=%f, bottom=%f, top=%f",
+                -1F,
+                1F,
+                -actualRatio,
+                actualRatio
+            )
+        } else {// 原始比例小于窗口比例，缩放高度度会导致高度超出，因此，高度以窗口为准，缩放宽度
+            val actualRatio = worldRatio / originRatio
+            Matrix.orthoM(
+                projectionMatrix, 0,
+                -actualRatio, actualRatio,
+                -1F, 1F,
+                near, far
+            )
+            Timber.d(
+                "projectOrthogonally: left=%f, right=%f, bottom=%f, top=%f",
+                -actualRatio,
+                actualRatio,
+                -1F,
+                1F
+            )
         }
     }
 

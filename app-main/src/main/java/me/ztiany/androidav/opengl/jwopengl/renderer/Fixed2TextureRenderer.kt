@@ -16,7 +16,9 @@ class Fixed2TextureRenderer : GLRenderer {
     private val mvpMatrix by lazy { GLMVPMatrix() }
 
     /** 矩形的坐标 */
-    private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
+    private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3().map {
+        it * 0.5F
+    }.toFloatArray())
 
     /** 纹理坐标 */
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
@@ -44,7 +46,7 @@ class Fixed2TextureRenderer : GLRenderer {
         glTexture = GLTexture.generateFromBitmap(
             program.uniformHandle("uTexture"),
             0,
-            loadBitmap(R.drawable.beautiful_gril1)
+            loadBitmap(R.drawable.knight)
         )
     }
 
@@ -70,7 +72,7 @@ class Fixed2TextureRenderer : GLRenderer {
             uniformMatrix4fv("uProjectionMatrix", mvpMatrix.projectionMatrix)
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4/*4 个点*/)
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         }
     }
 

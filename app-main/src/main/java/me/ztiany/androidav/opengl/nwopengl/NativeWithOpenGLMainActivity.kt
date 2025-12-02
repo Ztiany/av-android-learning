@@ -9,6 +9,7 @@ private const val RENDER_TYPE_BACKGROUND = 1
 private const val RENDER_TYPE_TRIANGLE = 2
 private const val RENDER_TYPE_TRIANGLE_WITH_VBO = 3
 private const val RENDER_TYPE_RECTANGLE = 4
+private const val RENDER_TYPE_TEXTURE1 = 5
 
 /**
  * OpenGL ES 2.0（C++） 学习主入口。
@@ -25,6 +26,7 @@ class NativeWithOpenGLMainActivity : AppCompatActivity() {
         CommonItem("绘制渐变三角形", RENDER_TYPE_TRIANGLE),
         CommonItem("绘制渐变三角形（VBO）", RENDER_TYPE_TRIANGLE_WITH_VBO),
         CommonItem("绘制渐变矩形（VBO+IBO）", RENDER_TYPE_RECTANGLE),
+        CommonItem("纹理渲染-1", RENDER_TYPE_TEXTURE1),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

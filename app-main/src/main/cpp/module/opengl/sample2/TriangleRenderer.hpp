@@ -5,20 +5,20 @@
 class TriangleRenderer : public GLRenderer {
 private:
     GlProgram *program = nullptr;           // 着色器程序指针
-    GlMVPMatrix *mvpMatrix = nullptr;     // MVP 矩阵管理器指针
+    GlMVPMatrix *mvpMatrix = nullptr;       // MVP 矩阵管理器指针
 
     // 三角形顶点位置数据 (x,y,z,w) - 齐次坐标
-    float positions[12] = {
-            0.0F, 0.5F, 0.0F, 1,  // 顶部顶点
-            -0.5F, -0.5F, 0.0F, 1, // 左下顶点
+    float positions[12]{
+            0.0F, 0.5F, 0.0F, 1,    // 顶部顶点
+            -0.5F, -0.5F, 0.0F, 1,  // 左下顶点
             0.5F, -0.5F, 0.0F, 1, // 右下顶点
     };
 
     // 顶点颜色数据 (r,g,b,a) - RGBA格式
-    float colors[12] = {
-            1.0F, 0.0F, 0.0F, 1.0F,  // 红色
-            0.0F, 1.0F, 0.0F, 1.0F,  // 绿色
-            0.0F, 0.0F, 1.0F, 1.0F,  // 蓝色
+    float colors[12]{
+            1.0F, 0.0F, 0.0F, 1.0F,      // 红色
+            0.0F, 1.0F, 0.0F, 1.0F,      // 绿色
+            0.0F, 0.0F, 1.0F, 1.0F,    // 蓝色
     };
 
 public:
@@ -31,7 +31,7 @@ public:
     void onSurfaceCreated() override {
         // 从 assets 加载着色器程序并编译链接
         program = GlProgram::fromAssets(
-                "shader/vertex_mvp_separated.glsl",      // 顶点着色器路径
+                "shader/vertex_mvp_separated.glsl",        // 顶点着色器路径
                 "shader/fragment_coloring.glsl"          // 片元着色器路径
         );
 
@@ -53,11 +53,11 @@ public:
         glViewport(0, 0, width, height);
 
         // 设置世界坐标系大小为视口大小
-        mvpMatrix->setWorldSize((float) width, (float) height);
+        mvpMatrix->setWorldSize(width, height);
 
         // 将模型大小设置为视口大小，使三角形填满整个视口
         // 对于简单三角形来说，这是一种合理的缩放策略
-        mvpMatrix->setModelSize((float) width, (float) height);
+        mvpMatrix->setModelSize(width, height);
 
         // 使用默认相机位置设置视图矩阵
         // 相机位于Z轴正方向，看向原点
@@ -80,7 +80,7 @@ public:
                         positions = const_cast<float *>(this->positions),
                         colors = const_cast<float *>(this->colors)](GlProgram &program) {
                     // 清空缓冲区
-                    program.clearBuffer();
+                    GlProgram::clearBuffer();
 
                     // 将矩阵数据传递给着色器 uniform 变量
                     program.uniformMatrix4fv("uModelMatrix", model);      // 模型矩阵
@@ -88,16 +88,18 @@ public:
                     program.uniformMatrix4fv("uProjectionMatrix", projection); // 投影矩阵
 
                     // 设置顶点属性指针
+                    // 位置属性，4 个分量(x,y,z,w)
                     program.vertexAttribPointerFloat(
                             "aPosition",
                             4,
                             positions
-                    ); // 位置属性，4 个分量(x,y,z,w)
+                    );
+                    // 颜色属性，4 个分量(r,g,b,a)
                     program.vertexAttribPointerFloat(
                             "aColor",
                             4,
                             colors
-                    );     // 颜色属性，4 个分量(r,g,b,a)
+                    );
 
                     // 执行绘制命令: 绘制三角形
                     // GL_TRIANGLES: 将顶点按照三个一组的方式绘制成三角形

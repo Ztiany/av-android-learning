@@ -19,20 +19,20 @@ private:
             GLsizeiptr size,
             const void *data,
             GLenum usage,
-            GLenum type = GL_ARRAY_BUFFER
+            GLenum type
     ) {
-        // 在显卡中创建 1 个 vbo，vbo 的编号放到 vbo 中。
+        // 在显卡中创建 1 个 positionVbo，positionVbo 的编号放到 positionVbo 中。
         GLuint vboId = 0;
         glGenBuffers(1, &vboId);
 
-        // 将创建的 vbo 设置到显卡卡槽上，让 type 对应的卡槽指向 vbo，此时 OpenGL 的当前状态，type 对应的卡槽指向
-        // 分配的 vbo。后续对 type 对应的卡槽的操作，都是对 vboId 进行操作。
+        // 将创建的 positionVbo 设置到显卡卡槽上，让 type 对应的卡槽指向 positionVbo，此时 OpenGL 的当前状态，
+        // type 对应的卡槽指向分配的 positionVbo。后续对 type 对应的卡槽的操作，都是对 vboId 进行操作。
         glBindBuffer(type, vboId);
 
-        // 向显卡申请 size 大小的内存，data 是初始化数据，usage 是使用模式
+        // 向显卡申请 size 大小的内存，data 是初始化数据，usage 是使用模式。
         glBufferData(type, size, data, usage);
 
-        // 操作完成后，解绑 type 卡槽
+        // 操作完成后，解绑 type 卡槽。
         glBindBuffer(type, 0);
         return new GlBO(vboId, size, type);
     }

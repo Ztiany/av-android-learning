@@ -5,10 +5,10 @@
 precision mediump float;
 #endif
 
-//纹理坐标
+// 纹理坐标
 varying vec2 vTextureCoordinate;
 
-//直接承载 YUV 的纹理
+// 直接承载 YUV 的纹理
 uniform samplerExternalOES uTexture;
 
 void main(){

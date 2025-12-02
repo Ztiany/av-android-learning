@@ -7,4 +7,6 @@ void initAssetManager(JNIEnv *env, jobject assetManager);
 
 unsigned char *loadAssetContent(const char *path, size_t &fileSize);
 
+unsigned char *loadFileContent(const char *path, size_t &fileSize);
+
 #endif //ANDROID_AV_RESOURCES_H

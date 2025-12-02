@@ -25,3 +25,19 @@ unsigned char *loadAssetContent(const char *path, size_t &fileSize) {
 
     return fileContent;
 }
+
+unsigned char *loadFileContent(const char *path, size_t &fileSize) {
+    unsigned char *fileContent = nullptr;
+    fileSize = 0;
+    FILE *file = fopen(path, "rb");
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        fileSize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        fileContent = new unsigned char[fileSize + 1];
+        fread(fileContent, 1, fileSize, file);
+        fileContent[fileSize] = 0;
+        fclose(file);
+    }
+    return fileContent;
+}

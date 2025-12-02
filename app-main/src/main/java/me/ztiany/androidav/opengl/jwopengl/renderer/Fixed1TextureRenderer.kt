@@ -47,7 +47,7 @@ class Fixed1TextureRenderer : GLRenderer {
         glTexture = GLTexture.generateFromBitmap(
             program.uniformHandle("uTexture"),
             0,
-            loadBitmap(R.drawable.beautiful_gril1)
+            loadBitmap(R.drawable.beautiful_girl1)
         )
     }
 
@@ -71,7 +71,7 @@ class Fixed1TextureRenderer : GLRenderer {
             uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4/*4 个点*/)
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         }
     }
 
