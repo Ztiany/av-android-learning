@@ -8,6 +8,7 @@
 #include "sample2/TriangleVBORenderer.hpp"
 #include "sample2/RectangleVBORenderer.hpp"
 #include "sample2/TextureRenderer.hpp"
+#include "sample2/TextureBlendRenderer.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemoryLeak"
@@ -19,6 +20,7 @@ long createNativeRenderer(jint type) {
             {TriangleVBORenderer::TYPE,  []() { return new TriangleVBORenderer(); }},
             {RectangleVBORenderer::TYPE, []() { return new RectangleVBORenderer(); }},
             {TextureRenderer::TYPE,      []() { return new TextureRenderer(); }},
+            {TextureBlendRenderer::TYPE, []() { return new TextureBlendRenderer(); }},
     };
 
     auto it = creators.find(type);
