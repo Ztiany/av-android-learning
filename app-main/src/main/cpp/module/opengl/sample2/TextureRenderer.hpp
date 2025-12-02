@@ -35,7 +35,7 @@ public:
 
         mvpMatrix = new GlMVPMatrix();
 
-        auto positions = createVertexCoordinateFull4();
+        auto positions = createVertexCoordinateFull3();
         for (auto &val: positions) {
             val *= 0.5F;
         }
@@ -92,7 +92,7 @@ public:
             program.uniformMatrix4fv("uProjectionMatrix", projection);
 
             positionVbo->bind();
-            program.vertexAttribPointerFloat("aPosition", 4, nullptr);
+            program.vertexAttribPointerFloat("aPosition", 3, nullptr);
             positionVbo->unbind();
 
             textureCoordinateVbo->bind();
