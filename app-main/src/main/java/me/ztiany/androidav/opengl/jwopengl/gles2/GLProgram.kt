@@ -14,6 +14,8 @@ class GLProgram private constructor(
 
     private val attributeMap = mutableMapOf<String, Int>()
 
+    private val enabledAttribute = mutableSetOf<Int>()
+
     private val uniformMap = mutableMapOf<String, Int>()
 
     companion object {
@@ -49,16 +51,12 @@ class GLProgram private constructor(
 
     fun startDraw(onDraw: GLProgram.() -> Unit) {
         GLES20.glUseProgram(programHandle)
-
-        attributeMap.values.forEach {
-            GLES20.glEnableVertexAttribArray(it)
-        }
-
+        enabledAttribute.clear()
         onDraw(this)
-
-        attributeMap.values.forEach {
+        enabledAttribute.forEach {
             GLES20.glDisableVertexAttribArray(it)
         }
+        enabledAttribute.clear()
         GLES20.glUseProgram(0)
     }
 
@@ -71,14 +69,18 @@ class GLProgram private constructor(
      */
     fun vertexAttribPointerFloat(attribute: String, elementsPerVertex: Int, vbo: FloatBuffer) {
         // glVertexAttribPointer 函数在这里用于向 shader 传递顶点数据。
+        val attributeHandle = attributeHandle(attribute)
         GLES20.glVertexAttribPointer(
-            attributeHandle(attribute),
+            attributeHandle,
             elementsPerVertex,
             GLES20.GL_FLOAT,
             false,
             elementsPerVertex * 4/* 每个点 4 个 float，每个 float 4 个 byte */,
             vbo
         )
+
+        GLES20.glEnableVertexAttribArray(attributeHandle)
+        enabledAttribute.add(attributeHandle)
     }
 
     /**
@@ -86,14 +88,19 @@ class GLProgram private constructor(
      */
     fun vertexAttribPointerInt(attribute: String, elementsPerVertex: Int, vbo: FloatBuffer) {
         // glVertexAttribPointer 函数在这里向 shader 传递 int 数据。
+        val attributeHandle = attributeHandle(attribute)
+
         GLES20.glVertexAttribPointer(
-            attributeHandle(attribute),
+            attributeHandle,
             elementsPerVertex,
             GLES20.GL_INT,
             false,
             elementsPerVertex * 4/* 每个点 4 个 float，每个 float 4 个 byte */,
             vbo
         )
+
+        GLES20.glEnableVertexAttribArray(attributeHandle)
+        enabledAttribute.add(attributeHandle)
     }
 
     fun uniformMatrix4fv(uniformName: String, matrix: FloatArray) {
