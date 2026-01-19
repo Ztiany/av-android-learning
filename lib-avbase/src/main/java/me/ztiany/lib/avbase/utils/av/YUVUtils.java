@@ -10,9 +10,9 @@ public class YUVUtils {
 
     /**
      * NV21 画面顺时针旋转。参考：
-     * <p>
-     * 1. https://stackoverflow.com/questions/44994510/how-to-convert-rotate-raw-nv21-array-image-android-media-image-from-front-ca
-     * 2. https://stackoverflow.com/questions/6853401/camera-pixels-rotated/31425229#31425229
+     * <ol>
+     * <li><a href="https://stackoverflow.com/questions/44994510/how-to-convert-rotate-raw-nv21-array-image-android-media-image-from-front-ca">how-to-convert-rotate-raw-nv21-array-image-android-media-image-from-front-ca...</a></li>
+     * <li><a href="https://stackoverflow.com/questions/6853401/camera-pixels-rotated/31425229#31425229">camera-pixels-rotated/31425229#31425229</a></li>
      * </p>
      */
     public static void nv21RotateCW(final byte[] yuv, final byte[] output, final int width, final int height, final int rotation) {
@@ -186,7 +186,7 @@ public class YUVUtils {
         // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算
         int length = y.length + u.length + v.length;
         int uIndex = 0, vIndex = 0;
-        for (int i = stride * height; i < length; i++) {
+        for (int i = stride * height; i < length; i += 2) {
             nv21[i] = v[vIndex++];
             nv21[i + 1] = u[uIndex++];
         }
@@ -344,7 +344,8 @@ public class YUVUtils {
 
     ///////////////////////////////////////////////////////////////////////////
     // I420
-    ///////////////////////////////////////////////////////////////////////////
+
+    /// ////////////////////////////////////////////////////////////////////////
     public static void i420Rotate90CW(byte[] data, byte[] output, int width, int height) {
         int yLength = width * height;
         int uLength = width * height >> 2;
